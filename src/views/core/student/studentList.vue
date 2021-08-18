@@ -128,7 +128,18 @@
           <el-input v-model="editStudentForm.studentName"></el-input>
         </el-form-item>
         <el-form-item label="性别" prop="sex">
-          <el-input v-model="editStudentForm.sex"></el-input>
+          <el-select
+            v-model="editStudentForm.sex"
+            placeholder="请选择性别"
+            clearable
+          >
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="联系方式" prop="email">
           <el-input v-model="editStudentForm.email"></el-input>
@@ -139,7 +150,7 @@
         <el-form-item label="家长姓名" prop="parentName">
           <el-input v-model="editStudentForm.parentName"></el-input>
         </el-form-item>
-        <el-form-item label="家长联系方式" prop="parentContact">
+        <el-form-item label="联系方式" prop="parentContact">
           <el-input
             v-model="editStudentForm.parentContact"
             type="number"
@@ -159,20 +170,35 @@
         </el-button>
       </span>
     </el-dialog>
-    <el-dialog title="提示" :visible.sync="uploadDialogVisible" width="30%">
+    <!-- 上传文件对话框 -->
+    <el-dialog title="上传文件" :visible.sync="uploadDialogVisible" width="30%">
       <el-form>
         <el-form-item label="请选择Excel文件">
-          <el-upload>
+          <!-- name的名字要和后端一致，action为后端接口地址 -->
+          <el-upload
+            :auto-upload="true"
+            :multiple="false"
+            :limit="1"
+            :on-exceed="handleExceed"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            :action="BASE_API + '/admin/core/dictStudent/import'"
+            name="file"
+            accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          >
             <el-button size="small" type="primary">点击上传</el-button>
+            <div slot="tip" class="el-upload__tip">
+              支持xls和xlsx类型文件，注意一次只能上传一个文件
+            </div>
           </el-upload>
         </el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
+      <!-- <span slot="footer" class="dialog-footer">
         <el-button @click="uploadDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="uploadDialogVisible = false">
           确 定
         </el-button>
-      </span>
+      </span> -->
     </el-dialog>
     <!-- 分页 -->
     <el-pagination
@@ -192,17 +218,28 @@ import studentApi from '@/api/core/student.js'
 export default {
   data() {
     return {
-      BASE_API: process.env.VUE_APP_BASE_API,
+      BASE_API: process.env.VUE_APP_BASE_API, //从环境变量拿到后端接口地址
       queryInfo: {
         // 获取用户的参数对象
         // query: '',
         // 当前的页数
         currentPage: 1,
-
         pageSize: 5
       },
       //总记录数
       total: 0,
+      options: [
+        {
+          value: '男',
+          label: '男'
+        },
+        {
+          value: '女',
+          label: '女'
+        }
+      ],
+      // 选中的性别
+      value: '',
       // 学生列表
       list: [],
       uploadDialogVisible: false,
@@ -269,6 +306,18 @@ export default {
         })
         .catch(err => err)
     },
+    fetchDataNoMessage() {
+      studentApi
+        .list(this.queryInfo.currentPage, this.queryInfo.pagesize)
+        .then(response => {
+          // console.log(response)
+          this.list = response.data.records
+          this.total = response.data.total
+          this.queryInfo.pageSize = response.data.size
+          this.listLoading = false
+        })
+        .catch(err => err)
+    },
     // 上传Excel
     upload() {
       this.uploadDialogVisible = true
@@ -280,13 +329,13 @@ export default {
     handleSizeChange(newsize) {
       // console.log(newsize)
       this.queryInfo.pagesize = newsize
-      this.fetchData()
+      this.fetchDataNoMessage()
     },
     // 监听页码的改变
     handleCurrentChange(newPage) {
       // debugger
       this.queryInfo.currentPage = newPage
-      this.fetchData()
+      this.fetchDataNoMessage()
     },
 
     removeById(student) {
@@ -300,7 +349,7 @@ export default {
         })
         .then(response => {
           this.$message.success(response.message)
-          this.fetchData()
+          this.fetchDataNoMessage()
         })
         .catch(error => {
           if (error === 'cancel') {
@@ -334,7 +383,7 @@ export default {
           .updateStudent(newStudent)
           .then(response => {
             this.$message.success(response.message)
-            this.fetchData()
+            this.fetchDataNoMessage()
             this.editdDialogVisible = false
           })
           .catch(err => err)
@@ -344,6 +393,25 @@ export default {
     editDialogClose() {
       // 重置表单
       this.$refs.editStudentFormRef.resetFields()
+    },
+    // 处理Excel上传成功 通信成功
+    handleSuccess(response) {
+      if (response.code === 0) {
+        this.$message.success('数据导入成功')
+        this.uploadDialogVisible = false
+        this.fetchDataNoMessage()
+      } else {
+        // 业务失败
+        this.$message.error(response.message)
+      }
+    },
+    //  通信失败
+    handleError(error) {
+      this.$message.error('数据导入失败')
+    },
+    // 当上传多于一个文件时
+    handleExceed() {
+      this.$message.warning('只能选取一个文件')
     }
   }
 }

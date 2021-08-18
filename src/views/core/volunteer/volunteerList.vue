@@ -12,6 +12,9 @@
             <el-button type="primary" size="medium" @click="addVolunteer">
               添加志愿者信息
             </el-button>
+            <el-button type="primary" @click="upload" icon="el-icon-upload">
+              导入Excel
+            </el-button>
             <el-button type="primary" size="medium" @click="exportData">
               导出Excel
             </el-button>
@@ -242,6 +245,30 @@
         </el-button>
       </span>
     </el-dialog>
+    <!-- 上传文件对话框 -->
+    <el-dialog title="上传文件" :visible.sync="uploadDialogVisible" width="30%">
+      <el-form>
+        <el-form-item label="请选择Excel文件">
+          <!-- name的名字要和后端一致，action为后端接口地址 -->
+          <el-upload
+            :auto-upload="true"
+            :multiple="false"
+            :limit="1"
+            :on-exceed="handleExceed"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            :action="BASE_API + '/admin/core/dictVolunteer/import'"
+            name="file"
+            accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+            <div slot="tip" class="el-upload__tip">
+              支持xls和xlsx类型文件，注意一次只能上传一个文件
+            </div>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
     <!-- 分页 -->
     <el-pagination
       @size-change="handleSizeChange"
@@ -272,6 +299,7 @@ export default {
     }
     return {
       BASE_API: process.env.VUE_APP_BASE_API,
+      uploadDialogVisible: false,
       loading: true,
       total: 0,
       queryInfo: {
@@ -341,17 +369,30 @@ export default {
           return this.$message.error('获取数据列表失败')
         })
     },
+    fetchDataNoMessage() {
+      volunteerApi
+        .fetchData(this.queryInfo.currentPage, this.queryInfo.pagesize)
+        .then(response => {
+          // console.log(response)
+          this.volunteerList = response.data.records
+          this.total = response.data.total
+          this.loading = false
+        })
+        .catch(() => {
+          return this.$message.error('获取数据列表失败')
+        })
+    },
     // 监听pageSize改变的事件
     handleSizeChange(newsize) {
       // console.log(newsize)
       this.queryInfo.pagesize = newsize
-      this.fetchData()
+      this.fetchDataNoMessage()
     },
     // 监听页码的改变
     handleCurrentChange(newPage) {
       // debugger
       this.queryInfo.currentPage = newPage
-      this.fetchData()
+      this.fetchDataNoMessage()
     },
     addVolunteer() {
       this.saveDialogVisible = true
@@ -365,7 +406,7 @@ export default {
           .then(response => {
             this.$message.success(response.message)
             this.saveDialogVisible = false
-            this.fetchData()
+            this.fetchDataNoMessage()
           })
           .catch(err => {
             return this.$message.error(err.message)
@@ -387,7 +428,7 @@ export default {
         })
         .then(response => {
           this.$message.success(response.message)
-          this.fetchData()
+          this.fetchDataNoMessage()
         })
         .catch(error => {
           if (error === 'cancel') {
@@ -419,13 +460,36 @@ export default {
           .update(volunteer)
           .then(response => {
             this.$message.success(response.message)
-            this.fetchData()
+            this.fetchDataNoMessage()
             this.editDialogVisible = false
           })
           .catch(err => {
             return this.$message.error(err.message)
           })
       })
+    },
+    // 上传Excel
+    upload() {
+      this.uploadDialogVisible = true
+    },
+    // 处理Excel上传成功 通信成功
+    handleSuccess(response) {
+      if (response.code === 0) {
+        this.$message.success('数据导入成功')
+        this.uploadDialogVisible = false
+        this.fetchDataNoMessage()
+      } else {
+        // 业务失败
+        this.$message.error(response.message)
+      }
+    },
+    //  通信失败
+    handleError(error) {
+      this.$message.error('数据导入失败')
+    },
+    // 当上传多于一个文件时
+    handleExceed() {
+      this.$message.warning('只能选取一个文件')
     },
     exportData() {
       window.location.href = this.BASE_API + '/admin/core/dictVolunteer/export'

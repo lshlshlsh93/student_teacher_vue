@@ -12,6 +12,9 @@
             <el-button type="primary" size="medium" @click="save">
               添加预备党员信息
             </el-button>
+            <el-button type="primary" @click="upload" icon="el-icon-upload">
+              导入Excel
+            </el-button>
             <el-button type="primary" size="medium" @click="exportData">
               导出Excel
             </el-button>
@@ -150,6 +153,36 @@
         </el-button>
       </span>
     </el-dialog>
+    <!-- 上传文件对话框 -->
+    <el-dialog title="上传文件" :visible.sync="uploadDialogVisible" width="30%">
+      <el-form>
+        <el-form-item label="请选择Excel文件">
+          <!-- name的名字要和后端一致，action为后端接口地址 -->
+          <el-upload
+            :auto-upload="true"
+            :multiple="false"
+            :limit="1"
+            :on-exceed="handleExceed"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            :action="BASE_API + '/admin/core/dictParty/import'"
+            name="file"
+            accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+            <div slot="tip" class="el-upload__tip">
+              支持xls和xlsx类型文件，注意一次只能上传一个文件
+            </div>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <!-- <span slot="footer" class="dialog-footer">
+        <el-button @click="uploadDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="uploadDialogVisible = false">
+          确 定
+        </el-button>
+      </span> -->
+    </el-dialog>
     <!-- 分页 -->
     <el-pagination
       style="margin-left: 15px;"
@@ -169,6 +202,7 @@ export default {
   data() {
     return {
       BASE_API: process.env.VUE_APP_BASE_API,
+      uploadDialogVisible: false,
       loading: true,
       // 表格数据
       tableData: [],
@@ -232,11 +266,34 @@ export default {
     },
     handleSizeChange(newSize) {
       this.queryInfo.pageSize = newSize
-      this.fetchData()
+      this.fetchDataNoMessage()
     },
     handleCurrentChange(newPage) {
       this.queryInfo.currentPage = newPage
-      this.fetchData()
+      this.fetchDataNoMessage()
+    },
+    // 上传Excel
+    upload() {
+      this.uploadDialogVisible = true
+    },
+    // 处理Excel上传成功 通信成功
+    handleSuccess(response) {
+      if (response.code === 0) {
+        this.$message.success('数据导入成功')
+        this.uploadDialogVisible = false
+        this.fetchDataNoMessage()
+      } else {
+        // 业务失败
+        this.$message.error(response.message)
+      }
+    },
+    //  通信失败
+    handleError(error) {
+      this.$message.error('数据导入失败')
+    },
+    // 当上传多于一个文件时
+    handleExceed() {
+      this.$message.warning('只能选取一个文件')
     },
     exportData() {
       window.location.href = this.BASE_API + '/admin/core/dictParty/export'
