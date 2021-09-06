@@ -22,7 +22,7 @@
               type="primary"
               @click="upload"
               icon="el-icon-upload"
-              v-if="getRole === 'admin'"
+              v-if="getRole === '[admin]'"
             >
               导入Excel
             </el-button>
@@ -30,7 +30,7 @@
               type="primary"
               size="medium"
               @click="exportData"
-              v-if="getRole === 'admin'"
+              v-if="getRole === '[admin]'"
             >
               导出Excel
             </el-button>
@@ -86,7 +86,7 @@
           align="center"
           label="操作"
           sortable
-          v-if="getRole === 'admin'"
+          v-if="getRole === '[admin]'"
         >
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="编辑" placement="top">

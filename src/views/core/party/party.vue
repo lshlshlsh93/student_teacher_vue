@@ -78,7 +78,12 @@
           align="center"
         ></el-table-column>
 
-        <el-table-column header-align="center" align="center" label="操作">
+        <el-table-column
+          header-align="center"
+          align="center"
+          label="操作"
+          v-if="getRole === '[admin]'"
+        >
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="编辑" placement="top">
               <el-button
@@ -293,6 +298,12 @@ export default {
   },
   created() {
     this.fetchData()
+  },
+  computed:{
+     getRole() {
+      // 获取当前角色
+      return this.$store.getters.roles
+    }
   },
   methods: {
     fetchData() {

@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="app-container">
+      <span>当前角色：{{ getRole }}</span>
       <div slot="header">
         <el-row :gutter="20">
           <el-col :span="8">
@@ -79,7 +80,12 @@
           prop="activityLevel"
           label="活动级别"
         ></el-table-column>
-        <el-table-column header-align="center" align="center" label="操作">
+        <el-table-column
+          header-align="center"
+          align="center"
+          label="操作"
+          v-if="getRole === '[admin]'"
+        >
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="编辑" placement="top">
               <el-button
@@ -353,7 +359,12 @@ export default {
     this.fetchData()
   },
   mounted() {},
-  computed: {},
+  computed: {
+    getRole() {
+      // 获取当前角色
+      return this.$store.getters.roles
+    }
+  },
   methods: {
     fetchData() {
       volunteerApi
