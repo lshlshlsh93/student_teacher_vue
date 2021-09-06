@@ -31,17 +31,17 @@
       >
         <el-table-column type="index" label="#"></el-table-column>
         <el-table-column
-          prop="teacherNo"
-          label="教师工号"
+          prop="studentNo"
+          label="学生学号"
           header-align="center"
           align="center"
           sortable
         ></el-table-column>
         <el-table-column
-          prop="teacherName"
+          prop="studentName"
           header-align="center"
           align="center"
-          label="教师姓名"
+          label="学生姓名"
           sortable
         ></el-table-column>
         <el-table-column
@@ -108,20 +108,20 @@
         ref="saveFormRef"
         label-width="100px"
       >
-        <el-form-item label="教师工号" prop="teacherNo">
+        <el-form-item label="学生学号" prop="studentNo">
           <el-input
-            v-model="saveForm.teacherNo"
+            v-model="saveForm.studentNo"
             type="number"
             clearable
-            placeholder="请输入教师工号"
+            placeholder="请输入学生学号"
           ></el-input>
         </el-form-item>
-        <el-form-item label="教师姓名" prop="teacherName">
+        <el-form-item label="学生姓名" prop="studentName">
           <el-input
-            v-model="saveForm.teacherName"
+            v-model="saveForm.studentName"
             minlength="1"
             clearable
-            placeholder="请输入教师姓名"
+            placeholder="请输入学生姓名"
           ></el-input>
         </el-form-item>
         <el-form-item label="论文名称" prop="paperTitle">
@@ -129,6 +129,8 @@
             v-model="saveForm.paperTitle"
             placeholder="请输入论文名称"
             minlength="1"
+            type="textarea"
+            :rows="2"
             clearable
           ></el-input>
         </el-form-item>
@@ -140,6 +142,8 @@
           <el-input
             v-model="saveForm.paperInformation"
             minlength="1"
+            type="textarea"
+            :rows="2"
             clearable
             placeholder="请输入刊物的信息"
           ></el-input>
@@ -154,12 +158,18 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item label="等级" prop="paperLevel">
-          <el-input
+          <el-select
             v-model="saveForm.paperLevel"
-            minlength="1"
+            placeholder="请选择等级"
             clearable
-            placeholder="请输入等级"
-          ></el-input>
+          >
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -171,7 +181,7 @@
     </el-dialog>
     <!-- 编辑 -->
     <el-dialog
-      title="编辑教师信息"
+      title="编辑"
       :visible.sync="editDialogVisible"
       width="30%"
       @close="handleEditClose"
@@ -182,20 +192,21 @@
         ref="editFormRef"
         label-width="100px"
       >
-        <el-form-item label="教师工号" prop="teacherNo">
+        <el-form-item label="学生学号" prop="studentNo">
           <el-input
-            v-model="editForm.teacherNo"
+            v-model="editForm.studentNo"
             type="number"
             clearable
-            placeholder="请输入教师工号"
+            :disabled="true"
+            placeholder="请输入学生学号"
           ></el-input>
         </el-form-item>
-        <el-form-item label="教师姓名" prop="teacherName">
+        <el-form-item label="学生姓名" prop="studentName">
           <el-input
-            v-model="editForm.teacherName"
+            v-model="editForm.studentName"
             minlength="1"
             clearable
-            placeholder="请输入教师姓名"
+            placeholder="请输入学生姓名"
           ></el-input>
         </el-form-item>
         <el-form-item label="论文名称" prop="paperTitle">
@@ -203,11 +214,13 @@
             v-model="editForm.paperTitle"
             placeholder="请输入论文名称"
             minlength="1"
+            type="textarea"
+            :rows="2"
             clearable
           ></el-input>
         </el-form-item>
         <el-form-item
-          label="刊物的信息
+          label="刊物信息
         "
           prop="paperInformation"
         >
@@ -215,6 +228,8 @@
             v-model="editForm.paperInformation"
             minlength="1"
             clearable
+            type="textarea"
+            :rows="2"
             placeholder="请输入刊物的信息"
           ></el-input>
         </el-form-item>
@@ -228,12 +243,18 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item label="等级" prop="paperLevel">
-          <el-input
+          <el-select
             v-model="editForm.paperLevel"
-            minlength="1"
+            placeholder="请选择等级"
             clearable
-            placeholder="请输入等级"
-          ></el-input>
+          >
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -304,37 +325,52 @@ export default {
       saveDialgVisible: false,
       editDialogVisible: false,
       saveForm: {
-        teacherNo: '',
-        teacherName: '',
+        studentNo: '',
+        studentName: '',
         paperTitle: '',
         paperInformation: '',
         paperTime: null,
         paperLevel: ''
       },
       editForm: {
-        teacherNo: '',
-        teacherName: '',
+        studentNo: '',
+        studentName: '',
         paperTitle: '',
         paperInformation: '',
         paperTime: null,
         paperLevel: ''
       },
       saveFormRules: {
-        teacherNo: [{ required: true, message: '不能为空' }],
-        teacherName: [{ required: true, message: '不能为空' }],
+        studentNo: [{ required: true, message: '不能为空' }],
+        studentName: [{ required: true, message: '不能为空' }],
         paperTitle: [{ required: true, message: '不能为空' }],
         paperInformation: [{ required: true, message: '不能为空' }],
         paperLevel: [{ required: true, message: '不能为空' }],
         paperTime: []
       },
       editFormRules: {
-        teacherNo: [{ required: true, message: '不能为空' }],
-        teacherName: [{ required: true, message: '不能为空' }],
+        studentNo: [{ required: true, message: '不能为空' }],
+        studentName: [{ required: true, message: '不能为空' }],
         paperTitle: [{ required: true, message: '不能为空' }],
         paperInformation: [{ required: true, message: '不能为空' }],
         paperLevel: [{ required: true, message: '不能为空' }],
         paperTime: []
-      }
+      },
+      options: [
+        {
+          value: '优秀',
+          label: '优秀'
+        },
+        {
+          value: '良好',
+          label: '良好'
+        },
+        {
+          value: '中等',
+          label: '中等'
+        }
+      ],
+      value: ''
     }
   },
   created() {
@@ -405,7 +441,7 @@ export default {
     },
     edit(value) {
       paperApi
-        .getById(value.teacherNo)
+        .getById(value.studentNo)
         .then(response => {
           // console.log(response)
           this.$message.success(response.message)
@@ -461,7 +497,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          return paperApi.removeById(value.teacherNo)
+          return paperApi.removeById(value.studentNo)
         })
         .then(response => {
           this.$message.success(response.message)

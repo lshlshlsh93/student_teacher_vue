@@ -1,64 +1,72 @@
 <template>
   <div class="app-container">
-    <el-card>
-      <div slot="header">
+    <div slot="header">
+      <div>
         <el-form
-          label-width="120px"
+          label-width="50px"
           :rules="addStudentFormRules"
           ref="addStudnetRef"
           :model="addStudentForm"
+          align="center"
         >
-          <el-form-item label="学号" prop="studentNo" label-width="80px">
+          <el-form-item label="学号" prop="studentNo" label-width="1000px">
             <el-input v-model="addStudentForm.studentNo"></el-input>
           </el-form-item>
-          <el-form-item label="学生姓名" prop="studentName" label-width="80px">
+          <el-form-item
+            label="学生姓名"
+            prop="studentName"
+            label-width="1000px"
+          >
             <el-input v-model="addStudentForm.studentName"></el-input>
           </el-form-item>
-          <el-form-item label="性别" prop="sex" label-width="80px">
+          <el-form-item label="性别" prop="sex" label-width="1000px">
             <el-input v-model="addStudentForm.sex"></el-input>
           </el-form-item>
-          <el-form-item label="联系方式" prop="email" label-width="80px">
+          <el-form-item label="联系方式" prop="email" label-width="1000px">
             <el-input v-model="addStudentForm.email"></el-input>
           </el-form-item>
-          <el-form-item label="家庭地址" prop="homeAddress" label-width="80px">
+          <el-form-item
+            label="家庭地址"
+            prop="homeAddress"
+            label-width="1000px"
+          >
             <el-input v-model="addStudentForm.homeAddress"></el-input>
           </el-form-item>
-          <el-form-item label="家长姓名" prop="parentName" label-width="80px">
+          <el-form-item label="家长姓名" prop="parentName" label-width="1000px">
             <el-input v-model="addStudentForm.parentName"></el-input>
           </el-form-item>
           <el-form-item
             label="家长联系方式"
             prop="parentContact"
-            label-width="80px"
+            label-width="1000px"
           >
             <el-input v-model="addStudentForm.parentContact"></el-input>
           </el-form-item>
           <el-form-item
             label="辅导员姓名"
             prop="counselorInformation"
-            label-width="80px"
+            label-width="1000px"
           >
             <el-input v-model="addStudentForm.counselorInformation"></el-input>
           </el-form-item>
-          <el-form-item
+          <!-- <el-form-item
             label="领导姓名"
             prop="leadershipInformation"
             label-width="80px"
           >
             <el-input v-model="addStudentForm.leadershipInformation"></el-input>
-          </el-form-item>
+          </el-form-item> -->
         </el-form>
         <el-button
           type="primary"
-          @click="saveData"
+          @click="saveDataSubmit"
           align="center"
           :disabled="saveBtnDisabled"
         >
           保存
         </el-button>
       </div>
-      <div></div>
-    </el-card>
+    </div>
   </div>
 </template>
 <script>
@@ -134,7 +142,7 @@ export default {
     }
   },
   methods: {
-    saveData() {
+    saveDataSubmit() {
       this.$refs.addStudnetRef.validate(valid => {
         // console.log(valid)
         if (!valid) return

@@ -10,15 +10,15 @@ export default {
     })
   },
 
-  getById(teacherNo) {
+  getById(studentNo) {
     return request({
-      url: '/admin/core/paper/list/' + teacherNo,
+      url: '/admin/core/paper/list/' + studentNo,
       method: 'get'
     })
   },
-  removeById(teacherNo) {
+  removeById(studentNo) {
     return request({
-      url: '/admin/core/paper/remove/' + teacherNo,
+      url: '/admin/core/paper/remove/' + studentNo,
       method: 'delete'
     })
   },

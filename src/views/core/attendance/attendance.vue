@@ -2,6 +2,7 @@
   <div>
     <div class="app-container">
       <!-- 头部区域 -->
+      <span>当前角色：{{ getRole }}</span>
       <div slot="header">
         <el-row :gutter="20">
           <el-col :span="8">
@@ -17,10 +18,20 @@
             >
               添加考勤信息
             </el-button>
-            <el-button type="primary" @click="upload" icon="el-icon-upload">
+            <el-button
+              type="primary"
+              @click="upload"
+              icon="el-icon-upload"
+              v-if="getRole === 'admin'"
+            >
               导入Excel
             </el-button>
-            <el-button type="primary" size="medium" @click="exportData">
+            <el-button
+              type="primary"
+              size="medium"
+              @click="exportData"
+              v-if="getRole === 'admin'"
+            >
               导出Excel
             </el-button>
           </el-col>
@@ -44,8 +55,8 @@
         <el-table-column
           header-align="center"
           align="center"
-          prop="teacherNo"
-          label="教师工号"
+          prop="studentNo"
+          label="学生学号"
           sortable
         ></el-table-column>
         <el-table-column
@@ -75,6 +86,7 @@
           align="center"
           label="操作"
           sortable
+          v-if="getRole === 'admin'"
         >
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="编辑" placement="top">
@@ -110,12 +122,12 @@
         label-width="80px"
         :rules="addAttendanceFormRules"
       >
-        <el-form-item label="教师工号" prop="teacherNo">
+        <el-form-item label="学生学号" prop="studentNo">
           <el-input
             :disabled="false"
-            v-model="addAttendanceForm.teacherNo"
+            v-model="addAttendanceForm.studentNo"
             type="number"
-            placeholder="请输入教师工号"
+            placeholder="请输入学生学号"
             clearable
           ></el-input>
         </el-form-item>
@@ -166,10 +178,10 @@
         label-width="80px"
         :rules="editFormRules"
       >
-        <el-form-item label="教师工号" prop="teacherNo">
+        <el-form-item label="学生学号" prop="studentNo">
           <el-input
             :disabled="false"
-            v-model="editForm.teacherNo"
+            v-model="editForm.studentNo"
             type="number"
             clearable
           ></el-input>
@@ -250,6 +262,7 @@
   </div>
 </template>
 <script>
+import Cookies from 'js-cookie'
 import attendanceApi from '@/api/core/attendance'
 export default {
   data() {
@@ -265,13 +278,13 @@ export default {
       editdDialogVisible: false,
       uploadDialogVisible: false,
       editForm: {
-        teacherNo: '',
+        studentNo: '',
         attendanceLocation: '',
         dormitoryNo: '',
         attendanceTime: ''
       },
       editFormRules: {
-        teacherNo: [{ required: true, message: '请输入学号', trigger: 'blur' }],
+        studentNo: [{ required: true, message: '请输入学号', trigger: 'blur' }],
         attendanceLocation: [
           { required: true, message: '请输入学号', trigger: 'blur' }
         ],
@@ -282,13 +295,13 @@ export default {
       btnDisabled: false,
       saveDialog: false,
       addAttendanceForm: {
-        teacherNo: '',
+        studentNo: '',
         attendanceLocation: '',
         dormitoryNo: '',
         attendanceTime: ''
       },
       addAttendanceFormRules: {
-        teacherNo: [
+        studentNo: [
           { required: true, message: '教师工号不能为空', trigger: 'blur' }
         ],
         attendanceLocation: [
@@ -304,7 +317,12 @@ export default {
     this.fetchData()
   },
   mounted() {},
-  computed: {},
+  computed: {
+    getRole() {
+      // 获取当前角色
+      return this.$store.getters.roles
+    }
+  },
   methods: {
     fetchData() {
       attendanceApi
@@ -346,7 +364,7 @@ export default {
     edit(value) {
       console.log(value)
       attendanceApi
-        .getById(value.teacherNo)
+        .getById(value.studentNo)
         .then(response => {
           console.log(response)
           this.editForm = response.data.attendance
@@ -385,7 +403,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          return attendanceApi.removeById(value.teacherNo)
+          return attendanceApi.removeById(value.studentNo)
         })
         .then(response => {
           this.$message.success(response.message)

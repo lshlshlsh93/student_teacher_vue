@@ -105,7 +105,7 @@
     <el-dialog
       title="添加志愿者"
       :visible.sync="saveDialogVisible"
-      width="40%"
+      width="30%"
       @close="addDialogClose"
     >
       <el-form
@@ -177,7 +177,7 @@
     <el-dialog
       title="编辑志愿者信息"
       :visible.sync="editDialogVisible"
-      width="40%"
+      width="30%"
       @close="editDialogClose"
     >
       <el-form

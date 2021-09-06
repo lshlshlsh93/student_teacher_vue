@@ -48,8 +48,14 @@
         <el-table-column
           header-align="center"
           align="center"
+          prop="studentName"
+          label="学生姓名"
+        ></el-table-column>
+        <el-table-column
+          header-align="center"
+          align="center"
           prop="courseName"
-          label="课程号"
+          label="课程名"
         ></el-table-column>
         <el-table-column
           header-align="center"
@@ -96,7 +102,7 @@
     <el-dialog
       title="添加成绩"
       :visible.sync="saveDialogVisible"
-      width="50%"
+      width="30%"
       @close="closeSaveDialog"
     >
       <el-form
@@ -106,19 +112,41 @@
         label-width="80px"
       >
         <el-form-item label="学号" prop="studentNo">
-          <el-input v-model="saveScoreForm.studentNo"></el-input>
+          <el-input
+            v-model="saveScoreForm.studentNo"
+            placeholder="请输入学号"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="课程号" prop="courseName">
-          <el-input v-model="saveScoreForm.courseName"></el-input>
+        <el-form-item label="学生姓名" prop="studentName">
+          <el-input
+            v-model="saveScoreForm.studentName"
+            placeholder="请输入学生姓名"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="开课学期">
-          <el-input v-model="saveScoreForm.team"></el-input>
+        <el-form-item label="课程名" prop="courseName">
+          <el-input
+            v-model="saveScoreForm.courseName"
+            placeholder="请输入课程名"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="成绩">
-          <el-input v-model="saveScoreForm.score" type="number"></el-input>
+        <el-form-item label="开课学期" prop="team">
+          <el-input
+            v-model="saveScoreForm.team"
+            placeholder="请输入开课学期"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="学业预警">
-          <el-input v-model="saveScoreForm.academicWarning"></el-input>
+        <el-form-item label="成绩" prop="score">
+          <el-input
+            v-model="saveScoreForm.score"
+            type="number"
+            placeholder="请输入成绩"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="学业预警" prop="academicWarning">
+          <el-input
+            v-model="saveScoreForm.academicWarning"
+            placeholder="请输入学业预警"
+          ></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -137,19 +165,41 @@
         label-width="100px"
       >
         <el-form-item label="学号">
-          <el-input v-model="editScoreForm.studentNo"></el-input>
+          <el-input
+            v-model="editScoreForm.studentNo"
+            :disabled="true"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="课程号">
-          <el-input v-model="editScoreForm.courseName"></el-input>
+        <el-form-item label="学生姓名" prop="studentName">
+          <el-input
+            v-model="editScoreForm.studentName"
+            placeholder="请输入学生姓名"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="开课学期">
-          <el-input v-model="editScoreForm.team"></el-input>
+        <el-form-item label="课程名" prop="courseName">
+          <el-input
+            v-model="editScoreForm.courseName"
+            placeholder="请输入课程名"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="成绩">
-          <el-input v-model="editScoreForm.score" type="number"></el-input>
+        <el-form-item label="开课学期" prop="team">
+          <el-input
+            v-model="editScoreForm.team"
+            placeholder="请输入开课学期"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="学业预警">
-          <el-input v-model="editScoreForm.academicWarning"></el-input>
+        <el-form-item label="成绩" prop="score">
+          <el-input
+            v-model="editScoreForm.score"
+            type="number"
+            placeholder="请输入成绩"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="学业预警" prop="academicWarning">
+          <el-input
+            v-model="editScoreForm.academicWarning"
+            placeholder="请输入学业预警"
+          ></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -224,6 +274,14 @@ export default {
       }
       callback()
     }
+    var validateDigtalValue = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('值不能为空'))
+      } else if (value > 100 || value <= 0) {
+        callback(new Error('值不合法'))
+      }
+      callback()
+    }
 
     return {
       BASE_API: process.env.VUE_APP_BASE_API,
@@ -237,6 +295,7 @@ export default {
       },
       saveScoreForm: {
         studentNo: '',
+        studentName: '',
         courseName: '',
         team: '',
         score: '',
@@ -246,20 +305,48 @@ export default {
         studentNo: [
           { validator: checkstudentNo, trigger: 'blur', required: true }
         ],
+        studentName: [
+          { validator: validateValue, trigger: 'blur', required: true }
+        ],
         courseName: [
           { validator: validateValue, trigger: 'blur', required: true }
-        ]
+        ],
+        score: [
+          { validator: validateDigtalValue, trigger: 'blur', required: true }
+        ],
+        academicWarning: [
+          { validator: validateValue, trigger: 'blur', required: true }
+        ],
+        team: [{ validator: validateValue, trigger: 'blur', required: true }]
       },
       saveDialogVisible: false,
       editDialogVisible: false,
       editScoreForm: {
         studentNo: '',
+        studentName: '',
         courseName: '',
         team: '',
         score: '',
         academicWarning: ''
       },
-      editScoreFormRules: {}
+      editScoreFormRules: {
+        // studentNo: [
+        //   { validator: checkstudentNo, trigger: 'blur', required: true }
+        // ],
+        studentName: [
+          { validator: validateValue, trigger: 'blur', required: true }
+        ],
+        courseName: [
+          { validator: validateValue, trigger: 'blur', required: true }
+        ],
+        score: [
+          { validator: validateDigtalValue, trigger: 'blur', required: true }
+        ],
+        academicWarning: [
+          { validator: validateValue, trigger: 'blur', required: true }
+        ],
+        team: [{ validator: validateValue, trigger: 'blur', required: true }]
+      }
     }
   },
   created() {
@@ -334,7 +421,9 @@ export default {
     fetchDataById(row) {
       // console.log(row)
       scoreApi.getById(row.studentNo).then(response => {
-        this.editStudentForm = response.data.record
+        console.log(response)
+        this.editScoreForm = response.data.record
+        console.log(this.editScoreForm)
       })
     },
     editDialog(score) {
@@ -345,7 +434,7 @@ export default {
       this.$refs.editScoreFormRef.validate(valid => {
         if (!valid) return
         scoreApi
-          .update(this.editStudentForm)
+          .update(this.editScoreForm)
           .then(response => {
             this.$message.success(response.message)
             this.fetchData()

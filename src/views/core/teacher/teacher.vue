@@ -168,6 +168,7 @@
             clearable
             placeholder="请输入教师工号"
             type="number"
+            :disabled="true"
           ></el-input>
         </el-form-item>
         <el-form-item label="教师姓名" prop="teacherName">

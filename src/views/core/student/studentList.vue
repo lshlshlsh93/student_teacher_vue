@@ -65,12 +65,12 @@
         align="center"
         sortable
       />
-      <el-table-column
+      <!-- <el-table-column
         label="领导姓名"
         prop="leadershipInformation"
         align="center"
         sortable
-      />
+      /> -->
 
       <el-table-column label="操作" align="center">
         <template slot-scope="scope">
@@ -105,6 +105,90 @@
       </el-table-column>
     </el-table>
 
+    <!-- 添加对话框 -->
+    <el-dialog
+      title="添加"
+      :visible.sync="savedDialogVisible"
+      width="35%"
+      @close="saveDialogClose"
+    >
+      <el-form
+        :model="addStudentForm"
+        :rules="addStudentFormRules"
+        ref="addStudentFormRef"
+        label-width="120px"
+      >
+        <el-form-item label="学号" prop="studentNo">
+          <el-input
+            :disabled="false"
+            v-model="addStudentForm.studentNo"
+            type="number"
+            placeholder="注意学号是学生信息的唯一凭证，请输入合理的学号，例如不重复学号"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="学生姓名" prop="studentName">
+          <el-input
+            v-model="addStudentForm.studentName"
+            placeholder="请输入学生姓名"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="性别" prop="sex">
+          <el-select
+            v-model="addStudentForm.sex"
+            placeholder="请选择性别"
+            clearable
+          >
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="联系方式" prop="email">
+          <el-input
+            v-model="addStudentForm.email"
+            placeholder="请输入联系方式"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="家庭地址" prop="homeAddress">
+          <el-input
+            v-model="addStudentForm.homeAddress"
+            placeholder="请输入家庭地址"
+            type="textarea"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="家长姓名" prop="parentName">
+          <el-input
+            v-model="addStudentForm.parentName"
+            placeholder="请输入家长姓名"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="家长联系方式" prop="parentContact">
+          <el-input
+            v-model="addStudentForm.parentContact"
+            type="number"
+            placeholder="请输入家长联系方式"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="辅导员姓名" prop="counselorInformation">
+          <el-input
+            v-model="addStudentForm.counselorInformation"
+            placeholder="请输入辅导员姓名"
+          ></el-input>
+        </el-form-item>
+        <!-- <el-form-item label="领导姓名" prop="leadershipInformation">
+          <el-input v-model="editStudentForm.leadershipInformation"></el-input>
+        </el-form-item> -->
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="savedDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveDataSubmit">
+          确 定
+        </el-button>
+      </span>
+    </el-dialog>
     <el-dialog
       title="编辑学生信息"
       :visible.sync="editdDialogVisible"
@@ -119,7 +203,7 @@
       >
         <el-form-item label="学号" prop="studentNo">
           <el-input
-            :disabled="false"
+            :disabled="true"
             v-model="editStudentForm.studentNo"
             type="number"
           ></el-input>
@@ -145,7 +229,10 @@
           <el-input v-model="editStudentForm.email"></el-input>
         </el-form-item>
         <el-form-item label="家庭地址" prop="homeAddress">
-          <el-input v-model="editStudentForm.homeAddress"></el-input>
+          <el-input
+            v-model="editStudentForm.homeAddress"
+            type="textarea"
+          ></el-input>
         </el-form-item>
         <el-form-item label="家长姓名" prop="parentName">
           <el-input v-model="editStudentForm.parentName"></el-input>
@@ -159,9 +246,9 @@
         <el-form-item label="辅导员姓名" prop="counselorInformation">
           <el-input v-model="editStudentForm.counselorInformation"></el-input>
         </el-form-item>
-        <el-form-item label="领导姓名" prop="leadershipInformation">
+        <!-- <el-form-item label="领导姓名" prop="leadershipInformation">
           <el-input v-model="editStudentForm.leadershipInformation"></el-input>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editdDialogVisible = false">取 消</el-button>
@@ -218,6 +305,65 @@ import studentApi from '@/api/core/student.js'
 export default {
   data() {
     return {
+      saveBtnDisabled: false, //是否禁用保存按钮，防止表单重复提交
+      savedDialogVisible: false,
+      addStudentForm: {
+        studentNo: '',
+        studentName: '',
+        sex: '',
+        email: '',
+        homeAddress: '',
+        parentName: '',
+        parentContact: '',
+        counselorInformation: '',
+        leadershipInformation: ''
+      },
+      addStudentFormRules: {
+        studentName: [
+          { required: true, message: '请输入学生姓名', trigger: 'blur' },
+          { min: 1, max: 5, message: '长度在 1 到 10 个字符', trigger: 'blur' }
+        ],
+        studentNo: [
+          { required: true, message: '请输入学号', trigger: 'blur' },
+          { min: 10, max: 10, message: '长度在10字符', trigger: 'blur' }
+        ],
+        sex: [{ required: true, message: '请输入性别', trigger: 'blur' }],
+        email: [
+          { required: true, message: '请输入联系方式', trigger: 'blur' },
+          {
+            min: 1,
+            max: 30,
+            message: '不能为空',
+            trigger: 'blur'
+          }
+        ],
+        homeAddress: [
+          { required: true, message: '请输入家庭地址', trigger: 'blur' },
+          {
+            min: 1,
+            max: 50,
+            message: '长度在 1 到 50 个字符之间',
+            trigger: 'blur'
+          }
+        ],
+        parentName: [
+          { required: true, message: '请输入家长姓名', trigger: 'blur' },
+          { min: 1, max: 6, message: '长度在 1 到 6 个字符', trigger: 'blur' }
+        ],
+        parentContact: [
+          { required: true, message: '请输入家长联系方式', trigger: 'blur' },
+          {
+            min: 1,
+            max: 30,
+            message: '长度在 1 到 30 个字符',
+            trigger: 'blur'
+          }
+        ],
+        counselorInformation: [
+          { required: true, message: '请输入辅导员姓名', trigger: 'blur' }
+        ]
+      },
+
       BASE_API: process.env.VUE_APP_BASE_API, //从环境变量拿到后端接口地址
       queryInfo: {
         // 获取用户的参数对象
@@ -250,7 +396,7 @@ export default {
         studentNo: '',
         studentName: '',
         counselorInformation: '',
-        leadershipInformation: '',
+        // leadershipInformation: '',
         sex: '',
         parentName: '',
         parentContact: '',
@@ -265,10 +411,7 @@ export default {
         studentName: [
           { required: true, message: '请输入学生姓名', trigger: 'blur' }
         ],
-        sex: [
-          { required: true, message: '请输入性别', trigger: 'blur' },
-          { min: 1, max: 1, message: '性别长度应该为1位', trigger: 'blur' }
-        ],
+        sex: [{ required: true, message: '不能为空', trigger: 'blur' }],
         email: [{ required: true, message: '请输入联系方式', trigger: 'blur' }],
         homeAddress: [
           { required: true, message: '请输入家庭地址', trigger: 'blur' }
@@ -281,10 +424,11 @@ export default {
         ],
         counselorInformation: [
           { required: true, message: '请输入辅导员姓名', trigger: 'blur' }
-        ],
-        leadershipInformation: [
-          { required: true, message: '请输入领导姓名', trigger: 'blur' }
         ]
+        // 删除领导姓名模块
+        // leadershipInformation: [
+        //   { required: true, message: '请输入领导姓名', trigger: 'blur' }
+        // ]
       }
     }
   },
@@ -358,7 +502,24 @@ export default {
         })
     },
     saveData() {
-      this.$router.push('/core/student/create')
+      // this.$router.push('/core/student/create')
+      this.savedDialogVisible = true
+    },
+    saveDataSubmit() {
+      this.$refs.addStudentFormRef.validate(valid => {
+        // console.log(valid)
+        if (!valid) return
+        const stu = this.addStudentForm
+        studentApi
+          .save(stu)
+          .then(response => {
+            this.$message.success(response.message)
+            this.saveBtnDisabled = true
+            this.savedDialogVisible = false
+            //this.$router.push('/core/student/list')
+          })
+          .catch(err => err)
+      })
     },
 
     fetchDataById(student) {
@@ -388,6 +549,11 @@ export default {
           })
           .catch(err => err)
       })
+    },
+    // 监听关闭添加用户对话框的事件
+    saveDialogClose() {
+      // 重置表单
+      this.$refs.addStudentFormRef.resetFields()
     },
     // 监听关闭编辑用户对话框的事件
     editDialogClose() {

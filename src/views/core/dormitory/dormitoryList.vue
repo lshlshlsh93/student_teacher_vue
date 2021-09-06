@@ -40,7 +40,21 @@
           header-align="center"
           align="center"
           prop="dormitoryNo"
-          label="宿舍号"
+          label="编号"
+          sortable
+        ></el-table-column>
+         <el-table-column
+          header-align="center"
+          align="center"
+          prop="grade"
+          label="年级"
+          sortable
+        ></el-table-column>
+         <el-table-column
+          header-align="center"
+          align="center"
+          prop="major"
+          label="专业"
           sortable
         ></el-table-column>
         <el-table-column
@@ -91,7 +105,7 @@
     <el-dialog
       title="编辑宿舍信息"
       :visible.sync="editdDialogVisible"
-      width="40%"
+      width="30%"
       @close="editDialogClose"
     >
       <el-form
@@ -100,12 +114,28 @@
         ref="editDormitoryFormRef"
         label-width="100px"
       >
-        <el-form-item label="宿舍号" prop="dormitoryNo">
+        <el-form-item label="编号" prop="dormitoryNo">
           <el-input
-            :disabled="false"
+            :disabled="true"
             v-model="editDormitoryForm.dormitoryNo"
             type="number"
           ></el-input>
+        </el-form-item>
+         <el-form-item label="年级" prop="grade">
+       <el-select
+            v-model="editDormitoryForm.grade"
+            placeholder="请选择年级"
+          >
+            <el-option
+              v-for="item in gradeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+         <el-form-item label="专业" prop="major">
+          <el-input v-model="editDormitoryForm.major"></el-input>
         </el-form-item>
         <el-form-item label="楼号" prop="buildingNo">
           <el-input v-model="editDormitoryForm.buildingNo"></el-input>
@@ -138,7 +168,7 @@
     <el-dialog
       title="添加宿舍信息"
       :visible.sync="saveDialogVisible"
-      width="40%"
+      width="30%"
       @close="handleClose"
     >
       <!-- 添加表单 -->
@@ -148,11 +178,11 @@
         ref="saveDormitoryFormRef"
         label-width="100px"
       >
-        <el-form-item label="宿舍号" prop="dormitoryNo">
+        <el-form-item label="编号" prop="dormitoryNo">
           <el-input
             :disabled="false"
             v-model="saveDormitoryForm.dormitoryNo"
-            placeholder="请输入宿舍号"
+            placeholder="请输入编号"
             type="number"
           ></el-input>
         </el-form-item>
@@ -162,6 +192,25 @@
             placeholder="请输入楼号"
           ></el-input>
         </el-form-item>
+          <el-form-item label="年级" prop="grade">
+           <el-select
+            v-model="saveDormitoryForm.grade"
+            placeholder="请选择年级"
+          >
+            <el-option
+              v-for="item in gradeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+           </el-form-item>
+         <el-form-item label="专业" prop="major">
+          <el-input
+            v-model="saveDormitoryForm.major"
+            placeholder="请输入专业"
+          ></el-input>
+            </el-form-item>
         <el-form-item label="门牌号" prop="houseNo">
           <el-input
             v-model="saveDormitoryForm.houseNo"
@@ -255,6 +304,7 @@ export default {
       dormitoryList: [],
       total: 0,
       queryInfo: {
+        query:'',
         currentPage: 1,
         pagesize: 5
       },
@@ -262,12 +312,20 @@ export default {
       uploadDialogVisible: false,
       editDormitoryForm: {
         dormitoryNo: '',
+        grade:'',
+        major:'',
         buildingNo: '',
         houseNo: '',
         dormitoryType: ''
       },
       // 编辑表单验证规则
-      editDormitoryFormRules: {},
+      editDormitoryFormRules: {
+         dormitoryNo: [{ required: true, message: '不能为空' }],
+         grade: [{ required: true, message: '不能为空' }],
+         major: [{ required: true, message: '不能为空' }],
+         buildingNo: [{ required: true, message: '不能为空' }],
+         houseNo: [{ required: true, message: '不能为空' }]
+      },
       options: [
         {
           value: '男寝',
@@ -278,13 +336,42 @@ export default {
           label: '女寝'
         }
       ],
+
+       gradeOptions: [
+        {
+          value: '2018级',
+          label: '2018级'
+        },
+         {
+          value: '2019级',
+          label: '2019级'
+        },
+         {
+          value: '2020级',
+          label: '2020级'
+        },
+        {
+          value: '2021级',
+          label: '2021级'
+        },
+        {
+          value: '2022级',
+          label: '2022级'
+        }
+      ],
+     
       saveDialogVisible: false,
       // 新增宿舍信息列表
       saveDormitoryForm: {},
       // 表单验证规则
-      saveDormitoryFormRules: {},
-      // 选择宿舍列表的值
-      value: ''
+      saveDormitoryFormRules: {
+         dormitoryNo: [{ required: true, message: '不能为空' }],
+         grade: [{ required: true, message: '不能为空' }],
+         major: [{ required: true, message: '不能为空' }],
+         buildingNo: [{ required: true, message: '不能为空' }],
+         houseNo: [{ required: true, message: '不能为空' }]
+      },
+     
     }
   },
   created() {

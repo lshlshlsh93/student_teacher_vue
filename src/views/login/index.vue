@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <el-form
-      ref="loginForm"
+      ref="loginFormRef"
       :model="loginForm"
       :rules="loginRules"
       class="login-form"
@@ -9,9 +9,8 @@
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">登录到主页</h3>
+        <h2 class="title">登录</h2>
       </div>
-
       <el-form-item prop="username">
         <span class="svg-container">
           <svg-icon icon-class="user" />
@@ -27,34 +26,44 @@
         />
       </el-form-item>
 
-      <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
-        <el-input
-          :key="passwordType"
-          ref="password"
-          v-model="loginForm.password"
-          :type="passwordType"
-          placeholder="Password"
-          name="password"
-          tabindex="2"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
-        />
-        <span class="show-pwd" @click="showPwd">
-          <svg-icon
-            :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
+      <el-tooltip
+        v-model="capsTooltip"
+        content="开启大写锁定"
+        placement="right"
+        manual
+      >
+        <el-form-item prop="password">
+          <span class="svg-container">
+            <svg-icon icon-class="password" />
+          </span>
+          <el-input
+            :key="passwordType"
+            ref="password"
+            v-model="loginForm.password"
+            :type="passwordType"
+            placeholder="Password"
+            name="password"
+            tabindex="2"
+            auto-complete="on"
+            @keyup.native="checkCapslock"
+            @blur="capsTooltip = false"
+            @keyup.enter.native="handleLogin"
           />
-        </span>
-      </el-form-item>
-
+          <span class="show-pwd" @click="showPwd">
+            <svg-icon
+              :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
+            />
+          </span>
+        </el-form-item>
+      </el-tooltip>
       <el-button
+        v-preventClick="2000"
         :loading="loading"
         round
         type="primary"
-        style="width:20%;margin-bottom:30px; margin-left:50px"
+        style="width:20%;margin-bottom:30px; margin-left:120px"
         @click.native.prevent="handleLogin"
+        :disabled="btnDisabled"
       >
         登录
       </el-button>
@@ -65,9 +74,6 @@
         style="width:20%;margin-bottom:30px; "
       >
         重置
-      </el-button>
-      <el-button type="danger" @click="handleRegister" round>
-        立即注册
       </el-button>
       <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
@@ -84,8 +90,8 @@ export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+      if (value) {
+        callback(new Error('用户名不正确'))
       } else {
         callback()
       }
@@ -100,19 +106,28 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: '123456789'
       },
       loginRules: {
-        username: [
-          { required: true, trigger: 'blur', validator: validateUsername }
-        ],
-        password: [
-          { required: true, trigger: 'blur', validator: validatePassword }
-        ]
+        // username: [
+        //   { required: true, trigger: 'blur', validator: validateUsername }
+        // ],
+        // password: [
+        //   { required: true, trigger: 'blur', validator: validatePassword }
+        // ]
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
+      capsTooltip: false,
+      btnDisabled: false
+    }
+  },
+  mounted() {
+    if (this.loginForm.username === '') {
+      this.$refs.username.focus()
+    } else if (this.loginForm.password === '') {
+      this.$refs.password.focus()
     }
   },
   watch: {
@@ -124,6 +139,10 @@ export default {
     }
   },
   methods: {
+    checkCapslock(e) {
+      const { key } = e
+      this.capsTooltip = key && key.length === 1 && key >= 'A' && key <= 'Z'
+    },
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -135,18 +154,22 @@ export default {
       })
     },
     handleLogin() {
-      this.$refs.loginForm.validate(valid => {
+      // console.log('this', this)
+      this.$refs.loginFormRef.validate(valid => {
         if (valid) {
           this.loading = true
           this.$store
             .dispatch('user/login', this.loginForm)
             .then(() => {
-              this.$router.push({ path: this.redirect || '/' })
               this.loading = false
+              // this.$router.push({ path: this.redirect || '/' })
+              location.reload()
+              //通过Login后路由定向到首页
+              this.$router.push({ path: '/' })
             })
             .catch(() => {
               this.loading = false
-              this.$message.error('登陆失败')
+              // this.$message.error('登录失败')
             })
         } else {
           console.log('error submit!!')
@@ -154,9 +177,9 @@ export default {
         }
       })
     },
-    handleRegister() {
-      this.$router.push('/register')
-    },
+    // handleRegister() {
+    //   this.$router.push('/register')
+    // },
     resetForm(formName) {
       this.$refs[formName].resetFields()
     }
@@ -217,17 +240,17 @@ $dark_gray: #889aa4;
 $light_gray: #eee;
 
 .login-container {
-  // min-height: 100%;
-  // width: 100%;
-  // background-color: $bg;
-  // overflow: hidden;
-
+  min-height: 100%;
   width: 100%;
-  height: 100%;
-  background-image: url('../../assets/login_images/3056701c32ca456.jpg');
-  background-size: cover;
-  background-position: center;
-  position: relative;
+  background-color: $bg;
+  overflow: hidden;
+
+  // width: 100%;
+  // height: 100%;
+  // background-image: url('../../assets/login_images/3056701c32ca456.jpg');
+  // background-size: cover;
+  // background-position: center;
+  // position: relative;
 
   .login-form {
     position: relative;

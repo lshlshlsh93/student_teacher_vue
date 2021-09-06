@@ -55,8 +55,8 @@
           sortable
         ></el-table-column>
         <el-table-column
-          prop="dormitoryNo"
-          label="宿舍号"
+          prop="teacherNo"
+          label="辅导员工号"
           header-align="center"
           align="center"
           width="width"
@@ -86,7 +86,7 @@
     </div>
     <!-- 编辑对话框 -->
     <el-dialog
-      title="提示"
+      title="编辑"
       :visible.sync="editDialogVisible"
       width="30%"
       @close="handleEditClose"
@@ -99,6 +99,7 @@
       >
         <el-form-item label="年级编号" prop="classNo">
           <el-input
+            :disabled="true"
             v-model="editForm.classNo"
             size="medium"
             minlength="1"
@@ -127,9 +128,9 @@
             size="medium"
           ></el-input>
         </el-form-item>
-        <el-form-item label="宿舍号" prop="dormitoryNo">
+        <el-form-item label="辅导员工号" prop="teacherNo">
           <el-input
-            v-model="editForm.dormitoryNo"
+            v-model="editForm.teacherNo"
             size="medium"
             minlength="1"
             clearable
@@ -161,6 +162,7 @@
           <el-input
             v-model="saveForm.classNo"
             size="medium"
+            placeholder="请输入年级编号"
             minlength="1"
             clearable
           ></el-input>
@@ -185,13 +187,15 @@
             v-model="saveForm.professionNo"
             clearable
             size="medium"
+            placeholder="请输入专业号"
           ></el-input>
         </el-form-item>
-        <el-form-item label="宿舍号" prop="dormitoryNo">
+        <el-form-item label="辅导员工号" prop="teacherNo">
           <el-input
-            v-model="saveForm.dormitoryNo"
+            v-model="saveForm.teacherNo"
             size="medium"
             minlength="1"
+            placeholder="请输入辅导员工号"
             clearable
           ></el-input>
         </el-form-item>
@@ -267,13 +271,13 @@ export default {
         classNo: '',
         grade: '',
         professionNo: '',
-        dormitoryNo: 0
+        teacherNo: 0
       },
       saveForm: {},
       saveFormRules: {
         classNo: [{ required: true, message: '不能为空' }],
         professionNo: [{ required: true, message: '不能为空' }],
-        dormitoryNo: [{ required: true, message: '不能为空' }]
+        teacherNo: [{ required: true, message: '不能为空' }]
       },
       // 选中的值
       value: '',
@@ -377,7 +381,6 @@ export default {
       gradeApi.getById(value.classNo).then(response => {
         // console.log(response)
         this.editForm = response.data.record
-        this.$message.success(response.message)
       })
       this.editDialogVisible = true
     },

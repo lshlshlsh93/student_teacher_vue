@@ -45,6 +45,14 @@
           sortable
         ></el-table-column>
         <el-table-column
+          prop="studentName"
+          label="学生姓名"
+          header-align="center"
+          align="center"
+          width="width"
+          sortable
+        ></el-table-column>
+        <el-table-column
           prop="partyTime"
           header-align="center"
           align="center"
@@ -52,6 +60,15 @@
           width="width"
           sortable
           :formatter="dateFormat"
+        ></el-table-column>
+        <el-table-column
+          prop="transferPartyTime"
+          header-align="center"
+          align="center"
+          label="转预备党员时间"
+          width="width"
+          sortable
+          :formatter="dateFormat2"
         ></el-table-column>
         <el-table-column
           prop="courseName"
@@ -92,18 +109,42 @@
         :model="saveForm"
         :rules="saveFormRules"
         ref="saveFormRef"
-        label-width="100px"
+        label-width="150px"
       >
         <el-form-item label="学号" prop="studentNo">
-          <el-input v-model="saveForm.studentNo"></el-input>
+          <el-input
+            v-model="saveForm.studentNo"
+            placeholder="请输入学号"
+          ></el-input>
         </el-form-item>
-
+        <el-form-item label="学生姓名" prop="studentName" label-width="150px">
+          <el-input
+            v-model="saveForm.studentName"
+            placeholder="请输入学生姓名"
+          ></el-input>
+        </el-form-item>
         <el-form-item label="入党介绍人" prop="courseName">
-          <el-input v-model="saveForm.courseName"></el-input>
+          <el-input
+            placeholder="请输入入党介绍人"
+            v-model="saveForm.courseName"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="递交时间" prop="partyTime" label-width="100px">
+        <el-form-item label="递交时间" prop="partyTime" label-width="150px">
           <el-date-picker
             v-model="saveForm.partyTime"
+            type="datetime"
+            placeholder="选择日期"
+            format="yyyy-MM-dd HH:mm:ss"
+            value-format="yyyy-MM-dd HH:mm:ss"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item
+          label="转预备党员时间"
+          prop="transferPartyTime"
+          label-width="150px"
+        >
+          <el-date-picker
+            v-model="saveForm.transferPartyTime"
             type="datetime"
             placeholder="选择日期"
             format="yyyy-MM-dd HH:mm:ss"
@@ -123,22 +164,32 @@
       :visible.sync="editDialogVisible"
       width="30%"
     >
-      <el-form
-        :model="editForm"
-        :rules="editFormRules"
-        ref="editFormRef"
-        label-width="100px"
-      >
-        <el-form-item label="学号" prop="studentNo">
-          <el-input v-model="editForm.studentNo"></el-input>
+      <el-form :model="editForm" :rules="editFormRules" ref="editFormRef">
+        <el-form-item label="学号" prop="studentNo" label-width="150px">
+          <el-input v-model="editForm.studentNo" :disabled="true"></el-input>
         </el-form-item>
-
-        <el-form-item label="入党介绍人" prop="courseName">
+        <el-form-item label="学生姓名" prop="studentName" label-width="150px">
+          <el-input v-model="editForm.studentName"></el-input>
+        </el-form-item>
+        <el-form-item label="入党介绍人" prop="courseName" label-width="150px">
           <el-input v-model="editForm.courseName"></el-input>
         </el-form-item>
-        <el-form-item label="递交时间" prop="partyTime" label-width="100px">
+        <el-form-item label="递交时间" prop="partyTime" label-width="150px">
           <el-date-picker
             v-model="editForm.partyTime"
+            type="datetime"
+            placeholder="选择日期"
+            format="yyyy-MM-dd HH:mm:ss"
+            value-format="yyyy-MM-dd HH:mm:ss"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item
+          label="转预备党员时间"
+          prop="transferPartyTime"
+          label-width="150px"
+        >
+          <el-date-picker
+            v-model="editForm.transferPartyTime"
             type="datetime"
             placeholder="选择日期"
             format="yyyy-MM-dd HH:mm:ss"
@@ -214,23 +265,28 @@ export default {
       editDialogVisible: false,
       editForm: {
         partyTime: null,
+        transferPartyTime: null,
         studentNo: '',
-        courseName: ''
+        courseName: '',
+        studentName: ''
       },
       editFormRules: {
         partyTime: [],
         studentNo: [{ required: true, message: '不能为空', trigger: 'blur' }],
+        studentName: [{ required: true, message: '不能为空', trigger: 'blur' }],
         courseName: [{ required: true, message: '不能为空', trigger: 'blur' }]
       },
       savaDialogVisible: false,
       saveForm: {
         partyTime: null,
+        transferPartyTime: null,
         studentNo: '',
         courseName: ''
       },
       saveFormRules: {
         partyTime: [],
         studentNo: [{ required: true, message: '不能为空', trigger: 'blur' }],
+        studentName: [{ required: true, message: '不能为空', trigger: 'blur' }],
         courseName: [{ required: true, message: '不能为空', trigger: 'blur' }]
       }
     }
@@ -243,7 +299,7 @@ export default {
       partyApi
         .fetchData(this.queryInfo.currentPage, this.queryInfo.pageSize)
         .then(response => {
-          console.log(response)
+          // console.log(response)
           this.tableData = response.data.records
           this.queryInfo.currentPage = response.data.pageCurrent
           this.queryInfo.pageSize = response.data.size
@@ -256,10 +312,10 @@ export default {
       partyApi
         .fetchData(this.queryInfo.currentPage, this.queryInfo.pageSize)
         .then(response => {
-          console.log(response)
+          // console.log(response)
           this.tableData = response.data.records
           this.queryInfo.currentPage = response.data.pageCurrent
-          this.queryInfo.pageSize = response.data.size
+          // this.queryInfo.pageSize = response.data.size
           this.total = response.data.total
           this.loading = false
         })
@@ -301,10 +357,8 @@ export default {
     save() {
       this.savaDialogVisible = true
     },
-
     saveSubmit() {
       const add = this.saveForm
-
       this.$refs.saveFormRef.validate(valid => {
         if (!valid) return
         partyApi
@@ -347,9 +401,55 @@ export default {
           })
       })
     },
+    remove(value) {
+      // console.log(value)
+      this.$confirm('此操作将永久删除该预备党员信息, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          return partyApi.removeById(value.studentNo)
+        })
+        .then(response => {
+          this.$message.success(response.message)
+          this.fetchDataNoMessage()
+        })
+        .catch(error => {
+          if (error === 'cancel') {
+            this.$message.info('已取消删除')
+          }
+        })
+    },
     // 时间格式化方法
     dateFormat: function(row) {
       var t = new Date(row.partyTime) // row 表示一行数据, partyTime 表示要格式化的字段名称
+      if (!t) {
+        return ''
+      }
+      let year = t.getFullYear()
+      let month = this.dateIfAddZero(t.getMonth() + 1)
+      let day = this.dateIfAddZero(t.getDate())
+      let hours = this.dateIfAddZero(t.getHours())
+      let minutes = this.dateIfAddZero(t.getMinutes())
+      let seconds = this.dateIfAddZero(t.getSeconds())
+      return (
+        year +
+        '-' +
+        month +
+        '-' +
+        day +
+        ' ' +
+        hours +
+        ':' +
+        minutes +
+        ':' +
+        seconds
+      )
+    },
+    // 时间格式化方法
+    dateFormat2: function(row) {
+      var t = new Date(row.transferPartyTime) // row 表示一行数据, partyTime 表示要格式化的字段名称
       if (!t) {
         return ''
       }

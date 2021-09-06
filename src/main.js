@@ -9,6 +9,7 @@ import locale from 'element-ui/lib/locale/lang/zh-CN' // lang i18n
 import '@/styles/index.scss' // global css
 
 import App from './App'
+
 // 导入vuex
 import store from './store'
 
@@ -16,6 +17,8 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+
+import preventClick from './utils/controlClickState' //防止鼠标多次点击
 
 /**
  * If you don't want to use mock-server
@@ -29,7 +32,7 @@ if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
-
+Vue.use(preventClick)
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
@@ -60,6 +63,7 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+
   // store 能全局使用
   store,
   render: h => h(App)
