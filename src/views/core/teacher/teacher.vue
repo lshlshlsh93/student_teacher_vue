@@ -1,5 +1,9 @@
 <template>
   <div>
+    <!-- Backtop 回到顶部  -->
+    <div style="width: 100%;height: 100%;">
+      <el-backtop :bottom="60"></el-backtop>
+    </div>
     <div class="app-container">
       <div slot="header">
         <el-row :gutter="20">
@@ -65,7 +69,12 @@
           align="center"
           width="width"
         ></el-table-column>
-        <el-table-column header-align="center" align="center" label="操作">
+        <el-table-column
+          header-align="center"
+          align="center"
+          label="操作"
+          v-if="this.$store.getters.roles[0] === 'admin'"
+        >
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="编辑" placement="top">
               <el-button
@@ -249,6 +258,7 @@
   </div>
 </template>
 <script>
+import store from '@/store/index'
 import teacherApi from '@/api/core/teacher'
 export default {
   data() {
@@ -297,6 +307,12 @@ export default {
   },
   created() {
     this.fetchData()
+  },
+  computed: {
+    getRole() {
+      // 获取当前角色
+      return store.state.user.roles[0]
+    }
   },
   methods: {
     fetchData() {

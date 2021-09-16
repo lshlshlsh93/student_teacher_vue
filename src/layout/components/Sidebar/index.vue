@@ -33,15 +33,17 @@ export default {
   components: { SidebarItem, Logo },
   computed: {
     ...mapGetters(['sidebar']),
+
     routes() {
       /**
        * 挂载路由后，还需要在src/layout/components/Sidebar/index.vue中
        * 的routes成上面store/modules/modules/permission.js中配置的routes用以渲染侧边栏菜单：
        */
-      console.log(this.$router)
+      // console.log(this.$router)
       // return this.$router.options.routes
       return this.$store.getters.routes
     },
+
     activeMenu() {
       const route = this.$route
       const { meta, path } = route

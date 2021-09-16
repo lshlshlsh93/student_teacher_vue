@@ -1,5 +1,9 @@
 <template>
   <div>
+    <!-- Backtop 回到顶部  -->
+    <div style="width: 100%;height: 100%;">
+      <el-backtop :bottom="60"></el-backtop>
+    </div>
     <div class="app-container">
       <div slot="header">
         <el-row :gutter="20">
@@ -77,7 +81,7 @@
           header-align="center"
           align="center"
           label="操作"
-          v-if="getRole === '[admin]'"
+          v-if="this.$store.getters.roles[0] === 'admin'"
         >
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="编辑" placement="top">
@@ -313,6 +317,7 @@
   </div>
 </template>
 <script>
+import store from '@/store/index'
 import paperApi from '@/api/core/paper'
 export default {
   data() {
@@ -384,17 +389,16 @@ export default {
   computed: {
     getRole() {
       // 获取当前角色
-      return this.$store.getters.roles
+      return store.state.user.roles[0]
     }
   },
   methods: {
     fetchData() {
+      console.log(this.$store.getters.roles[0])
       paperApi
         .fetchData(this.queryInfo.currentPage, this.queryInfo.pageSize)
         .then(response => {
-          console.log(response)
           this.tableData = response.data.records
-          console.log(this.tableData)
           this.queryInfo.currentPage = response.data.pageCurrent
           this.queryInfo.pageSize = response.data.size
           this.total = response.data.total

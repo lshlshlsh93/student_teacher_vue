@@ -5,8 +5,6 @@
       <el-backtop :bottom="60"></el-backtop>
     </div>
     <div class="app-container">
-      <!-- 头部区域 -->
-      <!-- <span>当前角色：{{ getRole }}</span> -->
       <div slot="header">
         <el-row :gutter="20">
           <el-col :span="8">
@@ -15,35 +13,20 @@
             </el-input>
           </el-col>
           <el-col :span="15">
-            <el-button
-              type="primary"
-              size="medium"
-              @click="saveAttendanceDialog"
-            >
-              添加考勤信息
+            <el-button type="primary" size="medium" @click="saveDialog">
+              添加学科竞赛信息
             </el-button>
-            <el-button
-              type="primary"
-              @click="upload"
-              icon="el-icon-upload"
-              v-if="getRole === 'admin'"
-            >
+            <el-button type="primary" icon="el-icon-upload" @click="upload">
               导入Excel
             </el-button>
-            <el-button
-              type="primary"
-              size="medium"
-              @click="exportData"
-              v-if="getRole === 'admin'"
-            >
+            <el-button type="primary" size="medium" @click="exportData">
               导出Excel
             </el-button>
           </el-col>
         </el-row>
       </div>
-      <!-- 表格区域 -->
       <el-table
-        :data="attendanceList"
+        :data="subjectContestList"
         style="margin-top: 15px;"
         :v-loading="loading"
         border
@@ -66,23 +49,37 @@
         <el-table-column
           header-align="center"
           align="center"
-          sortable
-          prop="attendanceLocation"
-          label="考勤地点"
-        ></el-table-column>
-        <el-table-column
-          header-align="center"
-          align="center"
-          prop="dormitoryNo"
-          label="宿舍号"
+          prop="studentName"
+          label="学生姓名"
           sortable
         ></el-table-column>
         <el-table-column
           header-align="center"
           align="center"
-          prop="attendanceTime"
-          label="考勤时间"
+          prop="contestName"
+          label="比赛名称"
+          sortable
+        ></el-table-column>
+        <el-table-column
+          header-align="center"
+          align="center"
+          prop="organizer"
+          label="主办单位"
+          sortable
+        ></el-table-column>
+        <el-table-column
+          header-align="center"
+          align="center"
+          prop="entryTime"
+          label="参赛时间"
           :formatter="dateFormat"
+          sortable
+        ></el-table-column>
+        <el-table-column
+          header-align="center"
+          align="center"
+          prop="awardInformation"
+          label="获奖信息"
           sortable
         ></el-table-column>
         <el-table-column
@@ -115,109 +112,145 @@
     </div>
     <!-- 添加 -->
     <el-dialog
-      title=" 添加考勤信息"
-      :visible.sync="saveDialog"
+      title=" 添加"
+      :visible.sync="saveDialogVisible"
       width="30%"
-      @close="whenClose"
+      @close="handleSaveDialogClose"
     >
       <el-form
-        ref="addAttendanceFormRef"
-        :model="addAttendanceForm"
+        ref="addFormRef"
+        :model="addForm"
         label-width="80px"
-        :rules="addAttendanceFormRules"
+        :rules="addFormRules"
       >
         <el-form-item label="学生学号" prop="studentNo">
           <el-input
             :disabled="false"
-            v-model="addAttendanceForm.studentNo"
+            v-model="addForm.studentNo"
             type="number"
             placeholder="请输入学生学号"
             clearable
           ></el-input>
         </el-form-item>
-        <el-form-item label="考勤地点" prop="attendanceLocation">
+        <el-form-item label="学生姓名" prop="studentName">
           <el-input
             :disabled="false"
-            v-model="addAttendanceForm.attendanceLocation"
+            v-model="addForm.studentName"
             clearable
-            placeholder="请输入考勤地点"
+            placeholder="请输入学生姓名"
           ></el-input>
         </el-form-item>
-        <el-form-item label="宿舍号" prop="dormitoryNo">
+        <el-form-item label="比赛名称" prop="contestName">
           <el-input
             :disabled="false"
-            v-model="addAttendanceForm.dormitoryNo"
-            type="number"
+            v-model="addForm.contestName"
             clearable
-            placeholder="请输入宿舍号"
+            placeholder="请输入比赛名称"
           ></el-input>
         </el-form-item>
-        <el-form-item label="考勤时间" required>
+        <el-form-item label="主办单位" prop="organizer">
+          <el-input
+            :disabled="false"
+            v-model="addForm.organizer"
+            clearable
+            placeholder="请输入主办单位"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="参赛时间" required>
           <el-date-picker
-            v-model="addAttendanceForm.attendanceTime"
+            v-model="addForm.entryTime"
             type="date"
-            placeholder="选择日期"
+            placeholder="选择参赛时间"
             format="yyyy年MM月dd日"
             value-format="yyyy-MM-dd HH:mm:ss"
           ></el-date-picker>
         </el-form-item>
+        <el-form-item label="获奖信息" prop="awardInformation">
+          <el-input
+            type="textarea"
+            :disabled="false"
+            v-model="addForm.awardInformation"
+            clearable
+            placeholder="请输入获奖信息"
+          ></el-input>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="saveDialog = false">取 消</el-button>
+        <el-button @click="saveDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="saveSubmit">
           确 定
         </el-button>
       </span>
     </el-dialog>
-    <!-- 编辑对话框 -->
+    <!-- 编辑 -->
     <el-dialog
-      title="编辑考勤信息"
-      :visible.sync="editdDialogVisible"
-      width="30%"
-      @close="handleClose"
+      title=" 编辑"
+      :visible.sync="editDialogVisible"
+      width="40%"
+      @close="handleEditDialogClose"
     >
       <el-form
         ref="editFormRef"
         :model="editForm"
-        label-width="80px"
+        label-width="120px"
         :rules="editFormRules"
       >
         <el-form-item label="学生学号" prop="studentNo">
           <el-input
-            :disabled="false"
+            :disabled="true"
             v-model="editForm.studentNo"
             type="number"
+            placeholder="请输入学生学号"
             clearable
           ></el-input>
         </el-form-item>
-        <el-form-item label="考勤地点" prop="attendanceLocation">
+        <el-form-item label="学生姓名" prop="studentName">
           <el-input
             :disabled="false"
-            v-model="editForm.attendanceLocation"
+            v-model="editForm.studentName"
             clearable
+            placeholder="请输入学生姓名"
           ></el-input>
         </el-form-item>
-        <el-form-item label="宿舍号" prop="dormitoryNo">
+        <el-form-item label="比赛名称" prop="contestName">
           <el-input
             :disabled="false"
-            v-model="editForm.dormitoryNo"
-            type="number"
+            v-model="editForm.contestName"
             clearable
+            placeholder="请输入比赛名称"
           ></el-input>
         </el-form-item>
-        <el-form-item label="考勤时间" required>
+        <el-form-item label="主办单位" prop="organizer">
+          <el-input
+            :disabled="false"
+            v-model="editForm.organizer"
+            clearable
+            placeholder="请输入主办单位"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="参赛时间" required>
           <el-date-picker
-            v-model="editForm.attendanceTime"
+            v-model="editForm.entryTime"
             type="date"
-            placeholder="选择日期"
+            placeholder="选择参赛时间"
             format="yyyy年MM月dd日"
             value-format="yyyy-MM-dd HH:mm:ss"
           ></el-date-picker>
         </el-form-item>
+        <el-form-item label="获奖信息" prop="awardInformation">
+          <el-input
+            type="textarea"
+            autosize
+            :disabled="false"
+            v-model="editForm.awardInformation"
+            clearable
+            placeholder="请输入获奖信息"
+          ></el-input>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="editdDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="editSubmit" :disabled="btnDisabled">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editSubmit">
           确 定
         </el-button>
       </span>
@@ -234,23 +267,17 @@
             :on-exceed="handleExceed"
             :on-success="handleSuccess"
             :on-error="handleError"
-            :action="BASE_API + '/admin/core/dictAttendance/import'"
+            :action="BASE_API + '/admin/core/dictSubjectContest/import'"
             name="file"
             accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           >
             <el-button size="small" type="primary">点击上传</el-button>
             <div slot="tip" class="el-upload__tip">
-              支持xls和xlsx类型文件，注意一次只能上传一个文件
+              支持xlsx类型文件，注意一次只能上传一个文件
             </div>
           </el-upload>
         </el-form-item>
       </el-form>
-      <!-- <span slot="footer" class="dialog-footer">
-        <el-button @click="uploadDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="uploadDialogVisible = false">
-          确 定
-        </el-button>
-      </span> -->
     </el-dialog>
     <!-- 分页 -->
     <el-pagination
@@ -266,73 +293,83 @@
   </div>
 </template>
 <script>
-// 导入store
 import store from '@/store/index'
-import attendanceApi from '@/api/core/attendance'
+import subjectContestApi from '@/api/core/subjectContest'
 export default {
   data() {
     return {
+      // 后台地址
       BASE_API: process.env.VUE_APP_BASE_API,
-      attendanceList: [],
+      // 学科竞赛列表
+      subjectContestList: [],
       loading: false,
       queryInfo: {
         currentPage: 1,
         pageSize: 5
       },
+      // 总条数
       total: 0,
-      editdDialogVisible: false,
+      // 显示上传对话框
       uploadDialogVisible: false,
-      editForm: {
+      // 添加对话框
+      saveDialogVisible: false,
+      addForm: {
         studentNo: '',
-        attendanceLocation: '',
-        dormitoryNo: '',
-        attendanceTime: ''
+        studentName: '',
+        contestName: '',
+        organizer: '',
+        entryTime: null,
+        awardInformation: ''
       },
-      editFormRules: {
-        studentNo: [{ required: true, message: '请输入学号', trigger: 'blur' }],
-        attendanceLocation: [
-          { required: true, message: '请输入学号', trigger: 'blur' }
-        ],
-        dormitoryNo: [
-          { required: true, message: '请输入学号', trigger: 'blur' }
-        ]
-      },
-      btnDisabled: false,
-      saveDialog: false,
-      addAttendanceForm: {
-        studentNo: '',
-        attendanceLocation: '',
-        dormitoryNo: '',
-        attendanceTime: ''
-      },
-      addAttendanceFormRules: {
+      addFormRules: {
         studentNo: [{ required: true, message: '不能为空', trigger: 'blur' }],
-        attendanceLocation: [
+        studentName: [{ required: true, message: '不能为空', trigger: 'blur' }],
+        contestName: [{ required: true, message: '不能为空', trigger: 'blur' }],
+        organizer: [{ required: true, message: '不能为空', trigger: 'blur' }],
+        awardInformation: [
           { required: true, message: '不能为空', trigger: 'blur' }
         ],
-        dormitoryNo: [{ required: true, message: '不能为空', trigger: 'blur' }]
+        entryTime: []
+      },
+      editDialogVisible: false,
+      editForm: {
+        studentNo: '',
+        studentName: '',
+        contestName: '',
+        organizer: '',
+        entryTime: null,
+        awardInformation: ''
+      },
+      editFormRules: {
+        studentName: [{ required: true, message: '不能为空', trigger: 'blur' }],
+        contestName: [{ required: true, message: '不能为空', trigger: 'blur' }],
+        organizer: [{ required: true, message: '不能为空', trigger: 'blur' }],
+        awardInformation: [
+          { required: true, message: '不能为空', trigger: 'blur' }
+        ],
+        entryTime: []
       }
     }
   },
   created() {
     this.fetchData()
   },
-  mounted() {},
   computed: {
     getRole() {
-      // 获取当前角色
       return store.state.user.roles[0]
     }
   },
   methods: {
+    // 获取数据展示信息
     fetchData() {
-      attendanceApi
+      subjectContestApi
         .fetchData(this.queryInfo.currentPage, this.queryInfo.pageSize)
         .then(response => {
-          //  console.log(response)
-          this.attendanceList = response.data.records
-          this.queryInfo.currentPage = response.data.pageCurrent
-          this.total = response.data.total
+          // console.log(response)
+          if (response.code !== 0) return
+          this.subjectContestList = response.data.list.records
+          this.queryInfo.currentPage = response.data.list.pageCurrent
+          this.total = response.data.list.total
           this.loading = false
           return this.$message.success(response.message)
         })
@@ -340,50 +377,67 @@ export default {
           return this.$message.error(err.message)
         })
     },
+    // 获取数据不展示信息
     fetchDataNoMessage() {
-      attendanceApi
+      subjectContestApi
         .fetchData(this.queryInfo.currentPage, this.queryInfo.pageSize)
         .then(response => {
-          //  console.log(response)
-          this.attendanceList = response.data.records
-          this.queryInfo.currentPage = response.data.pageCurrent
-          this.total = response.data.total
+          // console.log(response)
+          if (response.code !== 0) return
+          this.subjectContestList = response.data.list.records
+          this.queryInfo.currentPage = response.data.list.pageCurrent
+          this.total = response.data.list.total
           this.loading = false
         })
         .catch(err => {
           return this.$message.error(err.message)
         })
     },
-    handleSizeChange(newSize) {
-      this.queryInfo.pageSize = newSize
-      this.fetchDataNoMessage()
+    // 添加对话框
+    saveDialog() {
+      this.saveDialogVisible = true
     },
-    handleCurrentChange(newPage) {
-      this.queryInfo.currentPage = newPage
-      this.fetchDataNoMessage()
+    // 点击添加对话框中的确定提交时触发的事件
+    saveSubmit() {
+      this.$refs.addFormRef.validate(valid => {
+        if (!valid) return // window.alert('参数不合法')
+        const obj = this.addForm
+        subjectContestApi
+          .add(obj)
+          .then(response => {
+            this.$message.success(response.message)
+            this.fetchDataNoMessage()
+            this.saveDialogVisible = false
+          })
+          .catch(err => {
+            return this.$message.error(err)
+          })
+      })
     },
-    edit(value) {
-      attendanceApi
-        .getById(value.studentNo)
+    //编辑对话框
+    edit(val) {
+      // console.log(val)
+      subjectContestApi
+        .getById(val.studentNo, val.contestName)
         .then(response => {
           // console.log(response)
-          this.editForm = response.data.attendance
-          // this.$message.success(response.message)
+          this.editForm = response.data.subjectContest
         })
         .catch(err => {
           return this.$message.error(err.message)
         })
-      this.editdDialogVisible = true
+      this.editDialogVisible = true
     },
+    // 编辑提交
     editSubmit() {
-      const attendance = this.editForm
       this.$refs.editFormRef.validate(valid => {
         if (!valid) return
-        attendanceApi
-          .update(attendance)
+        const obj = this.editForm
+        subjectContestApi
+          .update(obj)
           .then(response => {
+            this.editDialogVisible = false
             this.fetchDataNoMessage()
-            this.editdDialogVisible = false
             return this.$message.success(response.message)
           })
           .catch(err => {
@@ -391,19 +445,24 @@ export default {
           })
       })
     },
-    // 编辑对话框关闭时重置表单
-    handleClose() {
+    // 关闭编辑对话框的事件
+    handleEditDialogClose() {
       this.$refs.editFormRef.resetFields()
     },
-    remove(value) {
-      //  console.log(value)
-      this.$confirm('此操作将永久删除该考勤信息, 是否继续?', '提示', {
+    // 关闭添加对话框的事件
+    handleSaveDialogClose() {
+      this.$refs.addFormRef.resetFields()
+    },
+    // 删除
+    remove(val) {
+      // console.log(val)
+      this.$confirm('此操作将永久删除该学科竞赛信息, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(() => {
-          return attendanceApi.removeById(value.studentNo)
+          return subjectContestApi.removeById(val.studentNo, val.contestName)
         })
         .then(response => {
           this.$message.success(response.message)
@@ -415,27 +474,15 @@ export default {
           }
         })
     },
-    saveAttendanceDialog() {
-      this.saveDialog = true
+    // 当分页大小发生变化
+    handleSizeChange(newSize) {
+      this.queryInfo.pageSize = newSize
+      this.fetchDataNoMessage()
     },
-    whenClose() {
-      this.$refs.addAttendanceFormRef.resetFields()
-    },
-    saveSubmit() {
-      this.$refs.addAttendanceFormRef.validate(valid => {
-        if (!valid) return
-        const newAttendance = this.addAttendanceForm
-        attendanceApi
-          .add(newAttendance)
-          .then(response => {
-            this.$message.success(response.message)
-            this.fetchDataNoMessage()
-            this.saveDialog = false
-          })
-          .catch(err => {
-            return this.$message.error(err)
-          })
-      })
+    // 当当前页数发生变化
+    handleCurrentChange(newPage) {
+      this.queryInfo.currentPage = newPage
+      this.fetchDataNoMessage()
     },
     // 上传Excel
     upload() {
@@ -461,11 +508,12 @@ export default {
       this.$message.warning('只能选取一个文件')
     },
     exportData() {
-      window.location.href = this.BASE_API + '/admin/core/dictAttendance/export'
+      window.location.href =
+        this.BASE_API + '/admin/core/dictSubjectContest/export'
     },
     // 时间格式化方法
     dateFormat: function(row) {
-      var t = new Date(row.attendanceTime) // row 表示一行数据, attendanceTime 表示要格式化的字段名称
+      var t = new Date(row.entryTime) // row 表示一行数据, attendanceTime 表示要格式化的字段名称
       if (!t) {
         return ''
       }

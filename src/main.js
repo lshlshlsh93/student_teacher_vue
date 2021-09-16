@@ -40,30 +40,9 @@ Vue.use(ElementUI, { locale })
 
 Vue.config.productionTip = false
 
-// // 定义一个全局的过滤器
-// Vue.filter('dateFormat', originVal => {
-//   const date = new Date(originVal)
-
-//   // 年
-//   const year = date.getFullYear()
-//   // 如果月不足一月就使用0代替
-//   const month = (date.getMonth() + 1 + '').padStart(2, '0')
-//   // 如果日不足一天就使用0代替
-//   const day = (date.getDay() + '').padStart(2, '0')
-//   // 小时
-//   const hour = (date.getHours() + '').padStart(2, '0')
-//   // 分钟
-//   const minutes = (date.getMinutes() + '').padStart(2, '0')
-//   // 秒数
-//   const seconds = (date.getSeconds() + '').padStart(2, '0')
-
-//   return `${year}年${month}月${day}日 ${hour}:${minutes}:${seconds}`
-// })
-
 new Vue({
   el: '#app',
   router,
-
   // store 能全局使用
   store,
   render: h => h(App)

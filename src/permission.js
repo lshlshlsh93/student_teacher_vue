@@ -5,7 +5,6 @@ import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
-import { filterAsyncRoutes } from '@/store/modules/permission'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration 是否展示右侧小圆圈
 
@@ -43,6 +42,8 @@ router.beforeEach(async (to, from, next) => {
           )
           // dynamically add accessible routes
           router.addRoutes(accessRoutes)
+
+          //      detail see that -->  src/layout/components/Sidebar/index.vue
           router.options.routes = store.getters.routers
 
           // hack method to ensure that addRoutes is complete

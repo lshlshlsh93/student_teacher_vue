@@ -48,7 +48,7 @@ export const asyncRoutes = [
     meta: {
       title: '学生信息管理',
       icon: 'el-icon-postcard',
-      roles: ['admin', 'teacher'] // you can set roles in root nav
+      roles: ['admin'] // you can set roles in root nav
     },
     alwaysShow: true,
     children: [
@@ -85,6 +85,15 @@ export const asyncRoutes = [
           icon: 'el-icon-sunrise'
         },
         hidden: false
+      },
+      {
+        path: 'finalgrade',
+        name: 'finalgradeList',
+        component: () => import('@/views/core/finalgrade/index'),
+        meta: {
+          title: '综合成绩列表',
+          icon: 'el-icon-sunrise'
+        }
       }
     ]
   },
@@ -96,7 +105,7 @@ export const asyncRoutes = [
       title: '宿舍管理',
       icon: 'el-icon-postcard',
       // if do not set roles, means: this page does not require permission
-      roles: ['admin', 'student', 'teacher'] // 角色
+      roles: ['admin', 'teacher'] // 角色
     },
     alwaysShow: true,
     children: [
@@ -120,7 +129,7 @@ export const asyncRoutes = [
     meta: {
       title: '志愿者管理',
       icon: 'el-icon-postcard',
-      roles: ['admin', 'student', 'teacher'] // 角色
+      roles: ['admin', 'teacher'] // 角色
     },
     alwaysShow: true,
     children: [
@@ -168,7 +177,7 @@ export const asyncRoutes = [
     redirect: 'noRedirect',
     meta: {
       title: '预备党员管理',
-      roles: ['admin'],
+      roles: ['admin', 'teacher'],
       icon: 'el-icon-postcard'
     },
     alwaysShow: true,
@@ -192,22 +201,42 @@ export const asyncRoutes = [
     component: Layout,
     redirect: 'noRedirect',
     meta: {
-      title: '发表论文管理',
-      roles: ['admin'],
+      title: '学科竞赛类',
+      roles: ['admin', 'teacher'],
       icon: 'el-icon-postcard'
     },
     alwaysShow: true,
     children: [
       {
-        path: 'list',
+        path: 'paperlist',
         name: 'paperList',
         component: () => import('@/views/core/paper/paper'),
         meta: {
-          title: '发表论文信息列表',
+          title: '发表论文信息',
           icon: 'el-icon-sunrise',
-          affix: true
+          affix: false
         },
         hidden: false
+      },
+      {
+        path: 'subjectcontest',
+        name: 'subjectContest',
+        component: () => import('@/views/core/subjectContest/index'),
+        meta: {
+          title: '学科竞赛',
+          icon: 'el-icon-sunrise',
+          affix: false
+        }
+      },
+      {
+        path: 'projectinformation',
+        name: 'projectInformation',
+        component: () => import('@/views/core/projectInformation/index'),
+        meta: {
+          title: '项目信息',
+          icon: 'el-icon-sunrise',
+          affix: false
+        }
       }
     ]
   },
@@ -229,8 +258,7 @@ export const asyncRoutes = [
         meta: {
           title: '教师信息列表',
           icon: 'el-icon-sunrise',
-
-          affix: true
+          affix: false
         },
         hidden: false
       }
@@ -256,7 +284,7 @@ export const asyncRoutes = [
           title: '考勤信息列表',
           icon: 'el-icon-sunrise',
           // affix：用于指定当前路由记录是否默认固定显示在 tagsView 上
-          affix: true
+          affix: false
         },
         hidden: false
       }
@@ -275,7 +303,7 @@ export const asyncRoutes = [
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
-// 教师动态路由权限表
+/* 教师动态路由权限表
 export const TeacherRoutes = [
   {
     path: '/score',
@@ -407,8 +435,9 @@ export const TeacherRoutes = [
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
+*/
 
-// 学生动态路由权限表
+/* 学生动态路由权限表
 export const StudentRoutes = [
   {
     path: '/attendance',
@@ -435,9 +464,20 @@ export const StudentRoutes = [
       }
     ]
   },
+  {
+    path: '/external-link',
+    component: Layout,
+    children: [
+      {
+        path: 'http://www.humc.edu.cn/',
+        meta: { title: '外链', icon: 'link' }
+      }
+    ]
+  },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
+*/
 
 //重置路由
 const createRouter = () =>

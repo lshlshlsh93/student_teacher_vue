@@ -1,7 +1,11 @@
 <template>
   <div>
+    <!-- Backtop 回到顶部  -->
+    <div style="width: 100%;height: 100%;">
+      <el-backtop :bottom="60"></el-backtop>
+    </div>
     <div class="app-container">
-      <span>当前角色：{{ getRole }}</span>
+      <!-- <span>当前角色：{{ getRole }}</span> -->
       <div slot="header">
         <el-row :gutter="20">
           <el-col :span="8">
@@ -84,7 +88,7 @@
           header-align="center"
           align="center"
           label="操作"
-          v-if="getRole === '[admin]'"
+          v-if="getRole === 'admin'"
         >
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="编辑" placement="top">
@@ -288,6 +292,7 @@
   </div>
 </template>
 <script>
+import store from '@/store/index'
 import volunteerApi from '@/api/core/volunteer'
 export default {
   data() {
@@ -301,10 +306,11 @@ export default {
         } else {
           callback()
         }
-      }, 100)
+      }, 2000)
     }
     return {
       BASE_API: process.env.VUE_APP_BASE_API,
+      // 是否显示上传文件对话框
       uploadDialogVisible: false,
       loading: true,
       total: 0,
@@ -312,9 +318,11 @@ export default {
         currentPage: 1,
         pagesize: 5
       },
+      // 后台查询到的志愿者数据列表
       volunteerList: [],
       saveDialogVisible: false,
       editDialogVisible: false,
+      // 添加表单
       addVolunteerForm: {
         studentNo: '',
         major: '',
@@ -323,6 +331,7 @@ export default {
         activityLevel: '',
         date: null
       },
+      // 编辑表单
       editVolunteerForm: {
         studentNo: '',
         major: '',
@@ -331,7 +340,20 @@ export default {
         activityLevel: '',
         date: null
       },
-      editVolunteerFormRules: {},
+      // 编辑规则
+      editVolunteerFormRules: {
+        major: [{ required: true, trigger: 'blur', message: '专业不能为空' }],
+        volunteerName: [
+          { required: true, trigger: 'blur', message: '志愿者姓名不能为空' }
+        ],
+        volunteerActivity: [
+          { required: true, trigger: 'blur', message: '活动类型不能为空' }
+        ],
+        activityLevel: [
+          { required: true, trigger: 'blur', message: '活动类型不能为空' }
+        ],
+        date: []
+      },
       addVolunteerFormRules: {
         studentNo: [
           {
@@ -361,8 +383,7 @@ export default {
   mounted() {},
   computed: {
     getRole() {
-      // 获取当前角色
-      return this.$store.getters.roles
+      return store.state.user.roles[0]
     }
   },
   methods: {

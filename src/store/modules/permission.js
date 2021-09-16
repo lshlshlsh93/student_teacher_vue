@@ -13,7 +13,6 @@ import {
  */
 function hasPermission(roles, route) {
   // 判断路由表中是否有roles
-  console.log(route)
   if (route.meta && route.meta.roles) {
     return roles.some(role => route.meta.roles.includes(role))
   } else {
@@ -28,7 +27,6 @@ function hasPermission(roles, route) {
  * @param roles
  */
 export function filterAsyncRoutes(routes, roles) {
-  debugger
   const res = []
   // 遍历之前要检查routes是否存在，不然会报错：Cannot read property 'forEach' of undefined
   if (!routes) return
@@ -69,15 +67,15 @@ const actions = {
   generateRoutes({ commit }, roles) {
     return new Promise(resolve => {
       let accessedRoutes
-      if (roles.includes('admin')) {
-        accessedRoutes = asyncRoutes || []
-      } else if (roles.includes('teacher')) {
-        accessedRoutes = TeacherRoutes || []
-      } else if (roles.includes('student')) {
-        accessedRoutes = StudentRoutes || []
-      } else {
-        accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
-      }
+      // if (roles.includes('admin')) {
+      // accessedRoutes = asyncRoutes || []
+      // } else if (roles.includes('teacher')) {
+      //   accessedRoutes = TeacherRoutes || []
+      // } else if (roles.includes('student')) {
+      //   accessedRoutes = StudentRoutes || []
+      //  } else {
+      accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
+      //  }
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
     })
