@@ -57,7 +57,6 @@
         </el-form-item>
       </el-tooltip>
       <el-button
-        v-preventClick="2000"
         :loading="loading"
         round
         type="primary"
@@ -105,8 +104,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '123456789'
+        username: '',
+        password: ''
       },
       loginRules: {
         // username: [
@@ -116,10 +115,15 @@ export default {
         //   { required: true, trigger: 'blur', validator: validatePassword }
         // ]
       },
+      // 是否显示加载中
       loading: false,
+      // 密码类型
       passwordType: 'password',
+      // 重定向
       redirect: undefined,
+      // 开启大写锁定
       capsTooltip: false,
+      // 按钮是否可用
       btnDisabled: false
     }
   },
@@ -154,22 +158,29 @@ export default {
       })
     },
     handleLogin() {
-      // console.log('this', this)
+      this.btnDisabled = true
+      setTimeout(() => {
+        this.btnDisabled = false
+      }, 2000)
       this.$refs.loginFormRef.validate(valid => {
         if (valid) {
           this.loading = true
           this.$store
             .dispatch('user/login', this.loginForm)
             .then(() => {
-              this.loading = false
-              // this.$router.push({ path: this.redirect || '/' })
+              // 1.点击登录首先刷新路由列表
               location.reload()
-              //通过Login后路由定向到首页
-              this.$router.push({ path: '/' })
+              // 设置一个两秒的定时器
+              setTimeout(() => {
+                // 2.关闭加载状态
+                this.loading = false
+                // 3.通过Login后路由定向到首页
+                this.$router.push({ path: '/' })
+              }, 2000)
+              // this.$router.push({ path: this.redirect || '/' })
             })
             .catch(() => {
               this.loading = false
-              // this.$message.error('登录失败')
             })
         } else {
           console.log('error submit!!')
@@ -177,10 +188,10 @@ export default {
         }
       })
     },
-    // handleRegister() {
-    //   this.$router.push('/register')
-    // },
+
     resetForm(formName) {
+      this.loginForm.username = ''
+      this.loginForm.password = ''
       this.$refs[formName].resetFields()
     }
   }

@@ -11,11 +11,11 @@ export function isExternal(path) {
 }
 
 /**
+ * 合法用户名集合
  * @param {string} str
  * @returns {Boolean}
  */
 export function validUsername(str) {
-  // 合法用户名集合
-  const valid_map = ['admin', 'teacher', 'student']
+  const valid_map = ['admin', 'editor', 'teacher', 'student']
   return valid_map.indexOf(str.trim()) >= 0
 }

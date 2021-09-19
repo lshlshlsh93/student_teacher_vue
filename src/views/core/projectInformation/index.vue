@@ -118,7 +118,7 @@
           label="操作"
           sortable
           width="130"
-          v-if="getRoles === 'admin'"
+          v-if="getRole === 'admin'"
         >
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="编辑" placement="top">
@@ -477,7 +477,7 @@ export default {
   },
   computed: {
     // 获取当前用户的角色
-    getRoles() {
+    getRole() {
       return store.state.user.roles[0]
     }
   },

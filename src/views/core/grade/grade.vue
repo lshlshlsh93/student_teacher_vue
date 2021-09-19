@@ -70,7 +70,7 @@
           header-align="center"
           align="center"
           label="操作"
-          v-if="this.$store.getters.roles[0] === 'admin'"
+          v-if="getRole === 'admin'"
         >
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="编辑" placement="top">
@@ -329,6 +329,7 @@ export default {
   },
   mounted() {},
   computed: {
+    // 获取用户角色
     getRole() {
       return store.state.user.roles[0]
     }
@@ -461,9 +462,7 @@ export default {
           })
       })
     }
-  },
-
-  computed: {}
+  }
 }
 </script>
 <style scoped></style>

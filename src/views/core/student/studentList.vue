@@ -6,11 +6,11 @@
     </div>
     <div slot="header">
       <el-row :gutter="20">
-        <el-col :span="8">
+        <!-- <el-col :span="8">
           <el-input placeholder="请输入内容" clearable>
             <el-button slot="append" icon="el-icon-search"></el-button>
           </el-input>
-        </el-col>
+        </el-col> -->
         <el-col :span="15">
           <el-button type="primary" @click="saveData">添加学生信息</el-button>
           <el-button type="primary" @click="upload" icon="el-icon-upload">
@@ -34,13 +34,19 @@
       <el-table-column
         label="学生姓名"
         prop="studentName"
-        width="70"
+        width="75"
         sortable
       />
       <el-table-column
         label="性别"
         prop="sex"
         width="50"
+        align="center"
+        sortable
+      />
+      <el-table-column
+        label="所属学院"
+        prop="college"
         align="center"
         sortable
       />
@@ -69,13 +75,6 @@
         align="center"
         sortable
       />
-      <!-- <el-table-column
-        label="领导姓名"
-        prop="leadershipInformation"
-        align="center"
-        sortable
-      /> -->
-
       <el-table-column label="操作" align="center" v-if="getRole === 'admin'">
         <template slot-scope="scope">
           <el-tooltip
@@ -112,80 +111,98 @@
     <!-- 添加对话框 -->
     <el-dialog
       title="添加"
+      style="overflow-y: auto"
       :visible.sync="savedDialogVisible"
-      width="35%"
+      width="40%"
       @close="saveDialogClose"
     >
-      <el-form
-        :model="addStudentForm"
-        :rules="addStudentFormRules"
-        ref="addStudentFormRef"
-        label-width="120px"
-      >
-        <el-form-item label="学号" prop="studentNo">
-          <el-input
-            :disabled="false"
-            v-model="addStudentForm.studentNo"
-            type="number"
-            placeholder="注意学号是学生信息的唯一凭证，请输入合理的学号，例如不重复学号"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="学生姓名" prop="studentName">
-          <el-input
-            v-model="addStudentForm.studentName"
-            placeholder="请输入学生姓名"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="性别" prop="sex">
-          <el-select
-            v-model="addStudentForm.sex"
-            placeholder="请选择性别"
-            clearable
-          >
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="联系方式" prop="email">
-          <el-input
-            v-model="addStudentForm.email"
-            placeholder="请输入联系方式"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="家庭地址" prop="homeAddress">
-          <el-input
-            v-model="addStudentForm.homeAddress"
-            placeholder="请输入家庭地址"
-            type="textarea"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="家长姓名" prop="parentName">
-          <el-input
-            v-model="addStudentForm.parentName"
-            placeholder="请输入家长姓名"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="家长联系方式" prop="parentContact">
-          <el-input
-            v-model="addStudentForm.parentContact"
-            type="number"
-            placeholder="请输入家长联系方式"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="辅导员姓名" prop="counselorInformation">
-          <el-input
-            v-model="addStudentForm.counselorInformation"
-            placeholder="请输入辅导员姓名"
-          ></el-input>
-        </el-form-item>
-        <!-- <el-form-item label="领导姓名" prop="leadershipInformation">
+      <div style="overflow-y: auto;height: 70vh;">
+        <el-form
+          :model="addStudentForm"
+          :rules="addStudentFormRules"
+          ref="addStudentFormRef"
+          label-width="120px"
+        >
+          <el-form-item label="学号" prop="studentNo">
+            <el-input
+              :disabled="false"
+              v-model="addStudentForm.studentNo"
+              type="number"
+              placeholder="注意学号是学生信息的唯一凭证，请输入合理的学号，例如不重复学号"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="学生姓名" prop="studentName">
+            <el-input
+              v-model="addStudentForm.studentName"
+              placeholder="请输入学生姓名"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="性别" prop="sex">
+            <el-select
+              v-model="addStudentForm.sex"
+              placeholder="请选择性别"
+              clearable
+            >
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="所属学院" prop="college">
+            <el-select
+              v-model="addStudentForm.college"
+              clearable
+              placeholder="请选择学院"
+            >
+              <el-option
+                v-for="item in collegeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="联系方式" prop="email">
+            <el-input
+              v-model="addStudentForm.email"
+              placeholder="请输入联系方式"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="家庭地址" prop="homeAddress">
+            <el-input
+              v-model="addStudentForm.homeAddress"
+              placeholder="请输入家庭地址"
+              type="textarea"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="家长姓名" prop="parentName">
+            <el-input
+              v-model="addStudentForm.parentName"
+              placeholder="请输入家长姓名"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="家长联系方式" prop="parentContact">
+            <el-input
+              v-model="addStudentForm.parentContact"
+              type="number"
+              placeholder="请输入家长联系方式"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="辅导员姓名" prop="counselorInformation">
+            <el-input
+              v-model="addStudentForm.counselorInformation"
+              placeholder="请输入辅导员姓名"
+            ></el-input>
+          </el-form-item>
+          <!-- <el-form-item label="领导姓名" prop="leadershipInformation">
           <el-input v-model="editStudentForm.leadershipInformation"></el-input>
         </el-form-item> -->
-      </el-form>
+        </el-form>
+      </div>
+
       <span slot="footer" class="dialog-footer">
         <el-button @click="savedDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="saveDataSubmit">
@@ -193,6 +210,7 @@
         </el-button>
       </span>
     </el-dialog>
+    <!-- 编辑对话框 -->
     <el-dialog
       title="编辑学生信息"
       :visible.sync="editdDialogVisible"
@@ -223,6 +241,20 @@
           >
             <el-option
               v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="所属学院" prop="college">
+          <el-select
+            v-model="editStudentForm.college"
+            clearable
+            placeholder="请选择学院"
+          >
+            <el-option
+              v-for="item in collegeOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -321,7 +353,8 @@ export default {
         parentName: '',
         parentContact: '',
         counselorInformation: '',
-        leadershipInformation: ''
+        college: ''
+        //  leadershipInformation: ''
       },
       addStudentFormRules: {
         studentName: [
@@ -389,6 +422,40 @@ export default {
           label: '女'
         }
       ],
+      collegeOptions: [
+        {
+          value: '理工学院',
+          label: '理工学院'
+        },
+        {
+          value: '经济学院',
+          label: '经济学院'
+        },
+        {
+          value: '商学院',
+          label: '商学院'
+        },
+        {
+          value: '人文学院',
+          label: '人文学院'
+        },
+        {
+          value: '医学院',
+          label: '医学院'
+        },
+        {
+          value: '艺术学院',
+          label: '艺术学院'
+        },
+        {
+          value: '传媒学院',
+          label: '传媒学院'
+        },
+        {
+          value: '体育学院',
+          label: '体育学院'
+        }
+      ],
       // 选中的性别
       value: '',
       // 学生列表
@@ -406,7 +473,8 @@ export default {
         parentName: '',
         parentContact: '',
         email: '',
-        homeAddress: ''
+        homeAddress: '',
+        college: null
       },
       editStudentFormRules: {
         studentNo: [
@@ -430,10 +498,6 @@ export default {
         counselorInformation: [
           { required: true, message: '请输入辅导员姓名', trigger: 'blur' }
         ]
-        // 删除领导姓名模块
-        // leadershipInformation: [
-        //   { required: true, message: '请输入领导姓名', trigger: 'blur' }
-        // ]
       }
     }
   },

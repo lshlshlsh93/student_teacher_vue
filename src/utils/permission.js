@@ -1,6 +1,7 @@
 import store from '@/store'
 
 /**
+ *  检查是否拥有权限
  * @param {Array} value
  * @returns {Boolean}
  * @example see @/views/permission/directive.vue
@@ -15,6 +16,7 @@ export default function checkPermission(value) {
     })
     return hasPermission
   } else {
+    // 没有权限
     console.error(`need roles! Like v-permission="['admin','editor']"`)
     return false
   }

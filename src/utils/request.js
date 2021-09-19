@@ -6,7 +6,6 @@ import { getToken } from '@/utils/auth'
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
-
   timeout: 5000 // request timeout
 })
 
@@ -31,7 +30,7 @@ service.interceptors.response.use(
   response => {
     const res = response.data
 
-    // 0 和 2000为成功
+    // 0 和 2000为成功响应码
     if (res.code !== 20000 && res.code !== 0) {
       Message({
         message: res.message || 'Error',

@@ -7,11 +7,11 @@
     <div class="app-container">
       <div slot="header">
         <el-row :gutter="20">
-          <el-col :span="8">
+          <!-- <el-col :span="8">
             <el-input placeholder="请输入内容" size="medium">
               <el-button slot="append" icon="el-icon-search"></el-button>
             </el-input>
-          </el-col>
+          </el-col> -->
           <el-col :span="15">
             <el-button type="primary" size="medium" @click="add">
               添加教师信息
@@ -40,40 +40,47 @@
           header-align="center"
           align="center"
           width="width"
-        ></el-table-column>
+        />
         <el-table-column
           prop="teacherName"
           header-align="center"
           align="center"
           label="教师姓名"
           width="width"
-        ></el-table-column>
+        />
+        <el-table-column
+          prop="college"
+          header-align="center"
+          align="center"
+          label="所属学院"
+          width="width"
+        />
         <el-table-column
           prop="post"
           label="岗位"
           width="width"
           header-align="center"
           align="center"
-        ></el-table-column>
+        />
         <el-table-column
           prop="title"
           label="职称"
           header-align="center"
           align="center"
           width="width"
-        ></el-table-column>
+        />
         <el-table-column
           prop="teacherContact"
           label="教师联系方式"
           header-align="center"
           align="center"
           width="width"
-        ></el-table-column>
+        />
         <el-table-column
           header-align="center"
           align="center"
           label="操作"
-          v-if="this.$store.getters.roles[0] === 'admin'"
+          v-if="getRole === 'admin'"
         >
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="编辑" placement="top">
@@ -99,7 +106,7 @@
     <!-- 对话框区域 -->
     <!-- 添加 -->
     <el-dialog
-      title="提交教师信息"
+      title="添加教师信息"
       :visible.sync="saveDialgVisible"
       width="30%"
       @close="handleSaveClose"
@@ -125,6 +132,20 @@
             clearable
             placeholder="请输入教师姓名"
           ></el-input>
+        </el-form-item>
+        <el-form-item label="所属学院" prop="college">
+          <el-select
+            v-model="saveForm.college"
+            clearable
+            placeholder="请选择学院"
+          >
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="岗位" prop="post">
           <el-input
@@ -160,6 +181,7 @@
     </el-dialog>
     <!-- 编辑 -->
     <el-dialog
+      style="overflow-y: auto"
       title="编辑教师信息"
       :visible.sync="editDialogVisible"
       width="30%"
@@ -188,6 +210,20 @@
             placeholder="请输入教师姓名"
           ></el-input>
         </el-form-item>
+        <el-form-item label="所属学院" prop="college">
+          <el-select
+            v-model="editForm.college"
+            clearable
+            placeholder="请选择学院"
+          >
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="岗位" prop="post">
           <el-input
             v-model="editForm.post"
@@ -197,12 +233,18 @@
           ></el-input>
         </el-form-item>
         <el-form-item label="职称" prop="title">
-          <el-input
+          <el-select
             v-model="editForm.title"
-            minlength="1"
             clearable
-            placeholder="请输入职称"
-          ></el-input>
+            placeholder="请选择职称"
+          >
+            <el-option
+              v-for="item in titleOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="联系方式" prop="teacherContact">
           <el-input
@@ -280,14 +322,16 @@ export default {
         teacherName: '',
         post: '',
         title: '',
-        teacherContact: ''
+        teacherContact: '',
+        college: ''
       },
       editForm: {
         teacherNo: '',
         teacherName: '',
         post: '',
         title: '',
-        teacherContact: ''
+        teacherContact: '',
+        college: ''
       },
       saveFormRules: {
         teacherNo: [{ required: true, message: '不能为空' }],
@@ -302,7 +346,77 @@ export default {
         post: [{ required: true, message: '不能为空' }],
         title: [{ required: true, message: '不能为空' }],
         teacherContact: [{ required: true, message: '不能为空' }]
-      }
+      },
+      // 院系的选择列表
+      options: [
+        {
+          value: '理工学院',
+          label: '理工学院'
+        },
+        {
+          value: '经济学院',
+          label: '经济学院'
+        },
+        {
+          value: '商学院',
+          label: '商学院'
+        },
+        {
+          value: '人文学院',
+          label: '人文学院'
+        },
+        {
+          value: '医学院',
+          label: '医学院'
+        },
+        {
+          value: '艺术学院',
+          label: '艺术学院'
+        },
+        {
+          value: '传媒学院',
+          label: '传媒学院'
+        },
+        {
+          value: '体育学院',
+          label: '体育学院'
+        }
+      ],
+      // 职称的选择列表
+      titleOptions: [
+        {
+          value: '辅导员',
+          label: '辅导员'
+        },
+        {
+          value: '专职教师',
+          label: '专职教师'
+        },
+        {
+          value: '学院副书记',
+          label: '学院副书记'
+        },
+        {
+          value: '学院副院长',
+          label: '学院副院长'
+        },
+        {
+          value: '学院院长',
+          label: '学院院长'
+        },
+        {
+          value: '副校长',
+          label: '副校长'
+        },
+        {
+          value: '校长',
+          label: '校长'
+        },
+        {
+          value: '书记',
+          label: '书记'
+        }
+      ]
     }
   },
   created() {
@@ -315,6 +429,7 @@ export default {
     }
   },
   methods: {
+    // 获取分页数据
     fetchData() {
       teacherApi
         .fetchData(this.queryInfo.currentPage, this.queryInfo.pageSize)
@@ -377,6 +492,7 @@ export default {
     handleExceed() {
       this.$message.warning('只能选取一个文件')
     },
+    // Excel数据导出
     exportData() {
       window.location.href = this.BASE_API + '/admin/core/dictTeacher/export'
     },
@@ -399,6 +515,7 @@ export default {
           })
       })
     },
+    // 编辑对话框的显示
     edit(value) {
       // console.log(value)
       teacherApi
@@ -412,6 +529,7 @@ export default {
           this.$message.error('获取失败')
         })
     },
+    // 编辑提交
     editSubmit() {
       this.$refs.editFormRef.validate(valid => {
         if (!valid) return
@@ -431,9 +549,11 @@ export default {
     handleSaveClose() {
       this.$refs.saveFormRef.resetFields()
     },
+    // 处理编辑对话框关闭
     handleEditClose() {
       this.$refs.editFormRef.resetFields()
     },
+    // 删除
     remove(value) {
       this.$confirm('此操作将永久删除该教师信息, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -453,8 +573,7 @@ export default {
           }
         })
     }
-  },
-  computed: {}
+  }
 }
 </script>
 <style scoped></style>
