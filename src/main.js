@@ -32,10 +32,14 @@ import preventClick from './utils/controlClickState' //防止鼠标多次点击
  * Currently MockJs will be used in the production environment,
  * please remove it before going online ! ! !
  */
+
+// 如果你的数据不是模拟的,则需要将/src/main.js中的以下代码注释掉
+/**
 if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
+*/
 
 Vue.use(preventClick)
 

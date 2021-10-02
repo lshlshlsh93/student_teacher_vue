@@ -14,9 +14,11 @@ const name = defaultSettings.title || '学生教师信息管理系统' // page t
 // You can change the port by the following methods:
 // port = 9528 npm run dev OR npm run dev --port = 9528
 const port = process.env.port || process.env.npm_config_port || 9528 // dev port
-// process.env.NODE_ENV === "development"
+
 module.exports = {
-  publicPath: '/',
+  // process.env.NODE_ENV === "development"
+  //  publicPath: './', // 打包后访问失败的话改为'./'
+  publicPath: process.env.NODE_ENV === 'development' ? '/' : './',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: false,
@@ -29,16 +31,24 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js'), // 注释mock-server生成的模拟数据
+
     proxy: {
-      '/dev-api': {
+      /* '/dev-api': {
         target: `http://localhost:8100`, // 后台服务地址
         changeOrigin: true,
         pathRewrite: {
           '^/dev-api': '/dev-api' // 路径重写
         }
+      },*/
+      [process.env.VUE_APP_BASE_API]: {
+        target: `http://localhost:8100`, // 后台服务地址
+        changeOrigin: true,
+        pathRewrite: {
+          ['^' + process.env.VUE_APP_BASE_API]: ''
+        }
       }
     }
+    // after: require('./mock/mock-server.js')
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

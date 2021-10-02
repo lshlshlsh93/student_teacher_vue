@@ -34,6 +34,7 @@
         :v-loading="loading"
       >
         <el-table-column type="index" label="#"></el-table-column>
+
         <el-table-column
           prop="classNo"
           label="年级编号"
@@ -239,12 +240,6 @@
           </el-upload>
         </el-form-item>
       </el-form>
-      <!-- <span slot="footer" class="dialog-footer">
-        <el-button @click="uploadDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="uploadDialogVisible = false">
-          确 定
-        </el-button>
-      </span> -->
     </el-dialog>
     <!-- 分页 -->
     <el-pagination
@@ -266,6 +261,8 @@ export default {
   data() {
     return {
       BASE_API: process.env.VUE_APP_BASE_API,
+      // 用户搜索输入的关键字
+      keyWords: '',
       loading: true,
       // 表格数据
       tableData: [],
